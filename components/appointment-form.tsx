@@ -93,6 +93,25 @@ export function AppointmentForm() {
         <form
           onSubmit={(e) => {
             e.preventDefault();
+
+            // collect form values including medical history
+            const form = e.currentTarget as HTMLFormElement;
+            const fd = new FormData(form);
+            const obj: Record<string, any> = {};
+            fd.forEach((value, key) => {
+              // normalize checkbox values: if key already exists, convert to array
+              if (obj[key]) {
+                if (Array.isArray(obj[key])) obj[key].push(value);
+                else obj[key] = [obj[key], value];
+              } else {
+                obj[key] = value;
+              }
+            });
+
+            // For now we just log the appointment payload. Replace with API call as needed.
+            // eslint-disable-next-line no-console
+            console.log("Appointment submitted:", obj);
+
             setSubmitted(true);
           }}
           className="mx-auto max-w-3xl"
@@ -257,6 +276,61 @@ export function AppointmentForm() {
                 rows={4}
                 className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
               />
+            </div>
+
+            {/* Medical History Section */}
+            <div className="flex flex-col gap-4 sm:col-span-2 mt-4">
+              <h3 className="text-sm font-semibold" style={{ color: "#0A2342" }}>
+                Medical History (check all that apply)
+              </h3>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="flex items-center gap-3">
+                  <input type="checkbox" name="history_diabetes" value="yes" className="h-4 w-4" />
+                  <span className="text-sm" style={{ color: "#555555" }}>Diabetes</span>
+                </label>
+
+                <label className="flex items-center gap-3">
+                  <input type="checkbox" name="history_heart" value="yes" className="h-4 w-4" />
+                  <span className="text-sm" style={{ color: "#555555" }}>Heart Disease</span>
+                </label>
+
+                <label className="flex items-center gap-3">
+                  <input type="checkbox" name="history_hypertension" value="yes" className="h-4 w-4" />
+                  <span className="text-sm" style={{ color: "#555555" }}>Hypertension</span>
+                </label>
+
+                <label className="flex items-center gap-3">
+                  <input type="checkbox" name="history_bleeding" value="yes" className="h-4 w-4" />
+                  <span className="text-sm" style={{ color: "#555555" }}>Bleeding Disorders</span>
+                </label>
+
+                <label className="flex items-center gap-3">
+                  <input type="checkbox" name="history_smoker" value="yes" className="h-4 w-4" />
+                  <span className="text-sm" style={{ color: "#555555" }}>Smoker</span>
+                </label>
+
+                <label className="flex items-center gap-3">
+                  <input type="checkbox" name="history_pregnant" value="yes" className="h-4 w-4" />
+                  <span className="text-sm" style={{ color: "#555555" }}>Pregnant</span>
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="allergies" className="text-sm font-medium" style={{ color: "#0A2342" }}>
+                    Allergies (if any)
+                  </Label>
+                  <Input id="allergies" name="allergies" placeholder="e.g. Penicillin, Latex" className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors" />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor="medications" className="text-sm font-medium" style={{ color: "#0A2342" }}>
+                    Current Medications
+                  </Label>
+                  <Input id="medications" name="medications" placeholder="List current medications" className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors" />
+                </div>
+              </div>
             </div>
           </div>
 

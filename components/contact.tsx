@@ -4,26 +4,26 @@ const details = [
   {
     icon: MapPin,
     title: "Visit Us",
-    lines: ["123 Smile Avenue", "Suite 200, San Francisco, CA 94102"],
+    lines: ["Nishat Colony, DHA phase 1", "Lahore, 54810"],
     link: "https://maps.app.goo.gl/L6x88ocRUk57H3iE8",
     linkText: "Get Directions",
   },
   {
     icon: Phone,
     title: "Call Us",
-    lines: ["(555) 123-4567", "(555) 123-4568"],
+    lines: [ "03088402625"],
   },
   {
     icon: Mail,
     title: "Email Us",
-    lines: ["hello@pearlshinedental.com", "appointments@pearlshinedental.com"],
+    lines: [ "Ahmedqureshi999@gmail.com"],
   },
   {
     icon: Clock,
     title: "Hours",
     lines: [
-      "Mon-Fri: 8:00 AM - 6:00 PM",
-      "Sat: 9:00 AM - 2:00 PM",
+      "Mon-Fri: 4:00 AM - 10:00 PM",
+      "Sat: 10:00 AM - 4:00 PM",
       "Sun: Closed",
     ],
   },

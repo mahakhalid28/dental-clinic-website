@@ -115,7 +115,7 @@ export function Hero() {
                   color: "rgba(255, 255, 255, 0.9)",
                 }}
               >
-                For over 30 years, we have been dedicated to excellence and
+                For over 8 years, we have been dedicated to excellence and
                 innovation in dental care. Our commitment to providing
                 exceptional, personalized treatment has made us a trusted name
                 in the community.
