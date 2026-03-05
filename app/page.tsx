@@ -1,11 +1,12 @@
-import { Header } from "@/components/header"
-import { Hero } from "@/components/hero"
-import { Services } from "@/components/services"
-import { About } from "@/components/about"
-import { Testimonials } from "@/components/testimonials"
-import { AppointmentForm } from "@/components/appointment-form"
-import { Contact } from "@/components/contact"
-import { Footer } from "@/components/footer"
+import { Header } from "@/components/header";
+import { Hero } from "@/components/hero";
+import { Stats } from "@/components/stats";
+import { Services } from "@/components/services";
+import { About } from "@/components/about";
+import { Testimonials } from "@/components/testimonials";
+import { AppointmentForm } from "@/components/appointment-form";
+import { Contact } from "@/components/contact";
+import { Footer } from "@/components/footer";
 
 export default function Home() {
   return (
@@ -13,6 +14,7 @@ export default function Home() {
       <Header />
       <main>
         <Hero />
+        <Stats />
         <Services />
         <About />
         <Testimonials />
@@ -21,5 +23,5 @@ export default function Home() {
       </main>
       <Footer />
     </div>
-  )
+  );
 }

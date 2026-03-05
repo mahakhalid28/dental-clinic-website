@@ -1,4 +1,13 @@
+"use client";
+
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
+import {
+  AnimateOnScroll,
+  StaggerContainer,
+  StaggerItem,
+  fadeInUp,
+  scaleIn,
+} from "./motion";
 
 const details = [
   {
@@ -11,12 +20,12 @@ const details = [
   {
     icon: Phone,
     title: "Call Us",
-    lines: [ "03088402625"],
+    lines: ["03088402625"],
   },
   {
     icon: Mail,
     title: "Email Us",
-    lines: [ "Ahmedqureshi999@gmail.com"],
+    lines: ["Ahmedqureshi999@gmail.com"],
   },
   {
     icon: Clock,
@@ -38,7 +47,10 @@ export function Contact() {
     >
       <div className="mx-auto max-w-7xl px-6">
         {/* Section Header */}
-        <div className="mx-auto mb-16 max-w-2xl text-center">
+        <AnimateOnScroll
+          variants={fadeInUp}
+          className="mx-auto mb-16 max-w-2xl text-center"
+        >
           <p
             className="text-sm font-semibold uppercase tracking-[0.2em]"
             style={{ color: "#BFA37C" }}
@@ -60,60 +72,64 @@ export function Contact() {
           >
             Have questions or want to learn more? We are always happy to help.
           </p>
-        </div>
+        </AnimateOnScroll>
 
         {/* Contact Info Grid */}
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        <StaggerContainer
+          className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
+          staggerDelay={0.12}
+        >
           {details.map((d) => (
-            <div
-              key={d.title}
-              className="group flex flex-col items-center gap-4 rounded-lg bg-white p-8 text-center shadow-sm border border-transparent transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:border-[#BFA37C]"
-            >
-              {/* Gold Icon */}
-              <div
-                className="flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110"
-                style={{ backgroundColor: "rgba(191, 163, 124, 0.15)" }}
-              >
-                <d.icon
-                  className="h-6 w-6 transition-colors duration-300"
-                  style={{ color: "#BFA37C" }}
-                />
-              </div>
+            <StaggerItem key={d.title} variants={scaleIn} className="h-full">
+              <div className="group h-full flex flex-col items-center rounded-2xl bg-white p-8 text-center shadow-sm border border-transparent transition-all duration-300 ease-out hover:-translate-y-2 hover:shadow-xl hover:border-[#BFA37C]">
+                {/* Gold Icon */}
+                <div
+                  className="flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 group-hover:scale-110 mb-4"
+                  style={{ backgroundColor: "rgba(191, 163, 124, 0.15)" }}
+                >
+                  <d.icon
+                    className="h-6 w-6 transition-colors duration-300"
+                    style={{ color: "#BFA37C" }}
+                  />
+                </div>
 
-              {/* Navy Bold Label */}
-              <h3
-                className="text-sm font-extrabold uppercase tracking-widest"
-                style={{ color: "#0A2342" }}
-              >
-                {d.title}
-              </h3>
+                {/* Navy Bold Label */}
+                <h3
+                  className="text-sm font-extrabold uppercase tracking-widest mb-4"
+                  style={{ color: "#0A2342" }}
+                >
+                  {d.title}
+                </h3>
 
-              {/* Muted Charcoal Details */}
-              <div className="flex flex-col gap-1">
-                {d.lines.map((line) => (
-                  <p
-                    key={line}
-                    className="text-sm"
-                    style={{ color: "#555555" }}
-                  >
-                    {line}
-                  </p>
-                ))}
+                {/* Muted Charcoal Details - flex-1 to fill remaining space */}
+                <div className="flex flex-col gap-1 flex-1 justify-center">
+                  {d.lines.map((line) => (
+                    <p
+                      key={line}
+                      className="text-sm"
+                      style={{ color: "#555555" }}
+                    >
+                      {line}
+                    </p>
+                  ))}
+                </div>
+
+                {/* Link at bottom (if exists) */}
                 {d.link && (
                   <a
                     href={d.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 text-sm font-semibold transition-all duration-200 hover:underline"
+                    className="mt-4 text-sm font-semibold transition-all duration-200 hover:underline"
                     style={{ color: "#0A2342" }}
                   >
                     {d.linkText} →
                   </a>
                 )}
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
       </div>
     </section>
   );

@@ -2,6 +2,13 @@
 
 import { Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AnimateOnScroll,
+  StaggerContainer,
+  StaggerItem,
+  fadeInUp,
+  scaleIn,
+} from "./motion";
 
 const testimonials = [
   {
@@ -53,7 +60,10 @@ export function Testimonials() {
     <section id="testimonials" className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6">
         {/* Section Header */}
-        <div className="mx-auto mb-16 max-w-2xl text-center">
+        <AnimateOnScroll
+          variants={fadeInUp}
+          className="mx-auto mb-16 max-w-2xl text-center"
+        >
           <p
             className="text-sm font-semibold uppercase tracking-[0.2em]"
             style={{ color: "#BFA37C" }}
@@ -66,86 +76,92 @@ export function Testimonials() {
           >
             Hear from our patients
           </h2>
-        </div>
+        </AnimateOnScroll>
 
         {/* Testimonials Grid */}
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <StaggerContainer
+          className="grid gap-8 md:grid-cols-2 lg:grid-cols-3"
+          staggerDelay={0.12}
+        >
           {testimonials.map((t, index) => (
-            <div
-              key={index}
-              className="group relative flex flex-col rounded-lg p-6 transition-all duration-300 hover:shadow-lg"
-              style={{
-                backgroundColor: "rgba(232, 227, 211, 0.3)",
-                border: "1px solid #E8E3D3",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "#BFA37C";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "#E8E3D3";
-              }}
-            >
-              {/* Gold Stars */}
-              <div className="mb-4 flex gap-1">
-                {Array.from({ length: t.rating }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className="h-4 w-4"
-                    style={{ fill: "#BFA37C", color: "#BFA37C" }}
-                  />
-                ))}
-              </div>
-
-              {/* Quote Text */}
-              <p
-                className="flex-1 text-base leading-7"
+            <StaggerItem key={index} variants={scaleIn}>
+              <div
+                className="group relative flex flex-col rounded-lg p-6 transition-all duration-300 hover:shadow-lg hover:-translate-y-2"
                 style={{
-                  fontStyle: "italic",
-                  color: "#555555",
-                  lineHeight: "1.8",
+                  backgroundColor: "rgba(232, 227, 211, 0.3)",
+                  border: "1px solid #E8E3D3",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = "#BFA37C";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = "#E8E3D3";
                 }}
               >
-                "{t.text}"
-              </p>
+                {/* Gold Stars */}
+                <div className="mb-4 flex gap-1">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <Star
+                      key={i}
+                      className="h-4 w-4"
+                      style={{ fill: "#BFA37C", color: "#BFA37C" }}
+                    />
+                  ))}
+                </div>
 
-              {/* Author & Source */}
-              <div
-                className="mt-6 flex items-center justify-between border-t pt-4"
-                style={{ borderColor: "#E8E3D3" }}
-              >
-                {/* Author Initials */}
+                {/* Quote Text */}
                 <p
-                  className="text-center font-bold"
-                  style={{ color: "#333333" }}
+                  className="flex-1 text-base leading-7"
+                  style={{
+                    fontStyle: "italic",
+                    color: "#555555",
+                    lineHeight: "1.8",
+                  }}
                 >
-                  {t.initials}
+                  "{t.text}"
                 </p>
 
-                {/* Source Icon */}
-                <span
-                  className="text-xs font-medium uppercase tracking-wide"
-                  style={{ color: "#999999" }}
+                {/* Author & Source */}
+                <div
+                  className="mt-6 flex items-center justify-between border-t pt-4"
+                  style={{ borderColor: "#E8E3D3" }}
                 >
-                  {t.source}
-                </span>
+                  {/* Author Initials */}
+                  <p
+                    className="text-center font-bold"
+                    style={{ color: "#333333" }}
+                  >
+                    {t.initials}
+                  </p>
+
+                  {/* Source Icon */}
+                  <span
+                    className="text-xs font-medium uppercase tracking-wide"
+                    style={{ color: "#999999" }}
+                  >
+                    {t.source}
+                  </span>
+                </div>
               </div>
-            </div>
+            </StaggerItem>
           ))}
-        </div>
+        </StaggerContainer>
 
         {/* Footer CTA */}
-        <div className="mt-12 flex justify-center">
-          <Button
-            size="lg"
-            className="rounded-md px-8 py-3 text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:opacity-90"
-            style={{
-              backgroundColor: "#0A2342",
-              color: "#FFFFFF",
-            }}
-          >
-            All Reviews
-          </Button>
-        </div>
+        <AnimateOnScroll variants={fadeInUp} delay={0.3}>
+          <div className="mt-12 flex justify-center">
+            <Button
+              size="lg"
+              className="rounded-md px-8 py-3 text-sm font-semibold uppercase tracking-wider transition-all duration-300 hover:opacity-90"
+              style={{
+                backgroundColor: "#0A2342",
+                color: "#FFFFFF",
+              }}
+            >
+              All Reviews
+            </Button>
+          </div>
+        </AnimateOnScroll>
       </div>
     </section>
   );

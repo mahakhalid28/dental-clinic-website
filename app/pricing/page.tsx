@@ -1,9 +1,15 @@
-import { AllServices } from "@/components/services";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/footer";
+import { PricingPage } from "@/components/pricing-page";
 
-export default function PricingPage() {
+export default function Pricing() {
   return (
-    <main className="min-h-screen bg-white">
-      <AllServices />
-    </main>
+    <>
+      <Header />
+      <main>
+        <PricingPage />
+      </main>
+      <Footer />
+    </>
   );
 }
