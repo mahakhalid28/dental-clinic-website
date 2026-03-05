@@ -8,11 +8,11 @@ const navLinks = [
   { label: "About", href: "#about" },
   { label: "New Patients", href: "#new-patients" },
   { label: "Services", href: "#services" },
-  { label: "Health", href: "#health" },
-  { label: "Photo/Video", href: "#gallery" },
   { label: "Blog", href: "#blog" },
+    { label: "Pricing", href: "#pricing" },
+
+
   { label: "Reviews", href: "#testimonials" },
-  { label: "Finance", href: "#finance" },
   { label: "Contact", href: "#contact" },
 ];
 
@@ -63,6 +63,13 @@ export function Header() {
               }}
             >
               (555) 123-4567
+            </Link>
+            <Link
+              href="/admin/login"
+              className="ml-6 inline-flex items-center px-3 py-2 rounded-md text-sm font-semibold bg-[#0A2342] text-white hover:bg-[#BFA37C] transition-colors"
+              aria-label="Admin login"
+            >
+              Admin Login
             </Link>
           </div>
 
@@ -135,6 +142,13 @@ export function Header() {
             >
               <Phone className="h-4 w-4 text-[#BFA37C]" />
               (555) 123-4567
+            </Link>
+            <Link
+              href="/admin/login"
+              className="flex items-center justify-center gap-2 rounded-lg border border-[#E8E3D3] px-6 py-3 text-sm font-medium uppercase tracking-wider text-[#0A2342] transition-colors hover:bg-[#F6F6F6]"
+              onClick={() => setMobileOpen(false)}
+            >
+              Admin Login
             </Link>
             <Link
               href="#appointment"

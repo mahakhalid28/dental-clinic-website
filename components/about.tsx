@@ -3,26 +3,34 @@
 import Image from "next/image";
 
 const doctors = [
+
   {
-    name: "Dr. Richard Fordjour",
-    specialty: "COSMETIC DENTIST",
-    image: "/images/doctor-1.jpg",
+    name: "Dr. Ahmed ",
+    specialty: "BDS, MSc Periodontology",
+    image: "/images/doctor-5.jpg",
   },
   {
-    name: "Dr. Sarah Chen",
-    specialty: "IMPLANT SPECIALIST",
-    image: "/images/doctor-2.jpg",
+    name: "Dr. Sharqa ",
+    specialty: "BDS, Orthodontics",
+    image: "/images/doctor-5.jpg",
+  },
+  
+   {
+    name: "Dr. Saif Rasool",
+    specialty: "BDS",
+    image: "/images/doctor-7.jpg",
+  },
+  
+  {
+    name: "Awais (Dental Assistant)",
+    specialty: "ASSISTANT",
+    image: "/images/doctor-7.jpg",
   },
   {
-    name: "Dr. Michael Torres",
-    specialty: "ORTHODONTIST",
-    image: "/images/doctor-3.jpg",
-  },
-  {
-    name: "Dr. Emily Watson",
-    specialty: "PEDIATRIC DENTIST",
-    image: "/images/doctor-4.jpg",
-  },
+    name: "Esha (Receptionist)",
+    specialty: "FRONT DESK",
+    image: "/images/doctor-6.jpg",
+  }
 ];
 
 export function About() {
@@ -44,14 +52,28 @@ export function About() {
               color: "#0A2342",
             }}
           >
-            Meet Our Doctors
+            Transforming Your Smile with Care and Precision
           </h2>
           <p
-            className="mt-4 text-lg leading-relaxed"
+            className="mt-4 text-lg leading-relaxed mx-auto max-w-prose"
             style={{ color: "#5A5A5A" }}
           >
-            Our team of specialists at Dental Ease brings decades of combined
-            experience and a passion for exceptional patient care.
+            Located at Nishat Colony at the back side of DHA phase 1, Lahore –
+            <span className="block font-medium italic" style={{ color: "#0A2342" }}>
+              where comfort meets confident smiles.
+            </span>
+            Complete dental care for the whole family, delivered with kindness,
+            precision, and modern technology.
+          </p>
+
+          {/* additional description about doctors can remain if desired */}
+          <p
+            className="mt-4 text-lg leading-relaxed mx-auto max-w-prose"
+            style={{ color: "#5A5A5A" }}
+          >
+            Our team of specialists at Dental Ease—dentists, assistants and
+            front‑desk staff—bring decades of combined experience and a
+            passion for exceptional patient care.
           </p>
         </div>
 
