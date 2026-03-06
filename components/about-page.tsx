@@ -29,7 +29,7 @@ const teamMembers = [
     specialty: "Periodontics & Gum Care",
     experience: "Specialist",
     education: "BDS, MSc Periodontology",
-    image: "/images/doctor-1.jpg",
+    image: "/images/ahmed.png",
     description:
       "Dr. Ahmed is our lead periodontist specializing in gum health and treatment. His expertise in periodontal care ensures patients receive the best treatment for gum diseases and overall oral health.",
   },
@@ -39,7 +39,7 @@ const teamMembers = [
     specialty: "Braces & Teeth Alignment",
     experience: "Specialist",
     education: "BDS, Orthodontics",
-    image: "/images/doctor-2.jpg",
+    image: "/images/sharqa.png",
     description:
       "Dr. Sharqa specializes in orthodontic treatments, helping patients achieve beautifully aligned smiles through braces and modern alignment techniques.",
   },
@@ -294,7 +294,7 @@ export function AboutPage() {
                   {[
                     { number: "8+", label: "Years" },
                     { number: "5000+", label: "Patients" },
-                    { number: "15+", label: "Dentists" },
+                    { number: "3+", label: "Dentists" },
                   ].map((stat) => (
                     <div key={stat.label} className="text-center">
                       <p

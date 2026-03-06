@@ -9,21 +9,15 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    setError(null);
 
-    // Placeholder: replace with real auth request
-    console.log("Admin login attempt:", { email, password });
-
+    // Simple redirect to admin dashboard without authentication
     setTimeout(() => {
-      setLoading(false);
-      // TODO: on success, redirect to /admin
-      // router.push('/admin')
-    }, 700);
+      window.location.href = '/admin';
+    }, 500);
   }
 
   return (
@@ -40,8 +34,6 @@ export default function AdminLoginPage() {
           <span className="text-sm font-medium text-[#0A2342]">Password</span>
           <Input type="password" value={password} onChange={(e) => setPassword((e.target as HTMLInputElement).value)} required />
         </label>
-
-        {error && <p className="text-sm text-red-600 mb-4">{error}</p>}
 
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Signing in..." : "Sign in"}

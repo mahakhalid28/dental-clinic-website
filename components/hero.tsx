@@ -4,42 +4,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Calendar, Phone } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 
 export function Hero() {
-  return (
-    <section id="home" className="relative w-full min-h-[90vh] overflow-hidden">
-      {/* Full-width Background Image with subtle zoom animation */}
-      <motion.div
-        className="absolute inset-0 w-full h-full"
-        initial={{ scale: 1.1 }}
-        animate={{ scale: 1 }}
-        transition={{ duration: 1.5, ease: "easeOut" }}
-      >
-        <Image
-          src="/images/hero-dental.jpg"
-          alt="Modern dental surgery room with state-of-the-art equipment"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-          style={{ objectPosition: "center" }}
-        />
-        {/* Dark overlay for contrast */}
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(90deg, rgba(10, 35, 66, 0.85) 0%, rgba(10, 35, 66, 0.4) 50%, rgba(10, 35, 66, 0.2) 100%)",
-          }}
-        />
-      </motion.div>
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const clinicImages = ["/images/clinicimage1.png", "/images/clinicimage2.png"];
 
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % clinicImages.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [clinicImages.length]);
+
+  return (
+    <section id="home" className="relative w-full min-h-[90vh] overflow-hidden bg-gradient-to-r from-[#0A2342] to-[#1a3a5c]">
       {/* Content Container */}
       <div className="relative z-10 mx-auto max-w-7xl px-6 py-24 lg:py-32">
         <div className="grid lg:grid-cols-12 gap-8 items-center min-h-[70vh]">
           {/* Floating Content Box with Marble Texture */}
           <motion.div
-            className="lg:col-span-6 xl:col-span-5 relative z-20 px-8 py-12 md:px-12 md:py-16 lg:-mr-20 overflow-hidden"
+            className="lg:col-span-6 xl:col-span-5 relative z-20 px-8 py-12 md:px-12 md:py-16 overflow-hidden"
             initial={{ opacity: 0, x: -80 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{
@@ -200,8 +186,33 @@ export function Hero() {
             </div>
           </motion.div>
 
-          {/* Right side - Empty space for image visibility */}
-          <div className="hidden lg:block lg:col-span-6 xl:col-span-7" />
+          {/* Right side - Clinic Image Carousel */}
+          <motion.div
+            className="hidden lg:flex lg:col-span-6 xl:col-span-7 items-center justify-center"
+            initial={{ opacity: 0, x: 80 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.5 }}
+          >
+            <div className="relative w-full h-[500px] rounded-2xl overflow-hidden shadow-2xl border-4" style={{ borderColor: "#BFA37C" }}>
+              <motion.div
+                key={currentImageIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5 }}
+                className="absolute inset-0"
+              >
+                <Image
+                  src={clinicImages[currentImageIndex]}
+                  alt="Dental clinic"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+              </motion.div>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>

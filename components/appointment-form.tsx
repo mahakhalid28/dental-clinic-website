@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,16 +23,14 @@ import {
 } from "lucide-react";
 import { AnimateOnScroll, fadeInUp, scaleIn } from "./motion";
 
-const services = [
-  "General Checkup",
-  "Teeth Cleaning",
-  "Teeth Whitening",
-  "Dental Implants",
-  "Cosmetic Consultation",
-  "Orthodontics",
-  "Pediatric Dentistry",
-  "Emergency Visit",
-];
+interface Service {
+  id: string;
+  service_name: string;
+  description: string;
+  price: number;
+  duration_minutes: number;
+  image?: string;
+}
 
 const timeSlots = [
   "9:00 AM",
@@ -53,6 +51,26 @@ const timeSlots = [
 
 export function AppointmentForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [services, setServices] = useState<Service[]>([]);
+  const [loadingServices, setLoadingServices] = useState(true);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        const response = await fetch("/api/services");
+        if (response.ok) {
+          const data: Service[] = await response.json();
+          setServices(data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch services:", error);
+      } finally {
+        setLoadingServices(false);
+      }
+    };
+
+    fetchServices();
+  }, []);
 
   if (submitted) {
     return (
@@ -190,7 +208,7 @@ export function AppointmentForm() {
                   {
                     icon: Users,
                     title: "Expert Care",
-                    desc: "15+ experienced dentists",
+                    desc: "3+ experienced dentists",
                   },
                   {
                     icon: Award,
@@ -283,15 +301,13 @@ export function AppointmentForm() {
               </div>
 
               <form
-                onSubmit={(e) => {
+                onSubmit={async (e) => {
                   e.preventDefault();
 
-                  // collect form values including medical history
                   const form = e.currentTarget as HTMLFormElement;
                   const fd = new FormData(form);
                   const obj: Record<string, any> = {};
                   fd.forEach((value, key) => {
-                    // normalize checkbox values: if key already exists, convert to array
                     if (obj[key]) {
                       if (Array.isArray(obj[key])) obj[key].push(value);
                       else obj[key] = [obj[key], value];
@@ -300,11 +316,34 @@ export function AppointmentForm() {
                     }
                   });
 
-                  // For now we just log the appointment payload. Replace with API call as needed.
-                  // eslint-disable-next-line no-console
-                  console.log("Appointment submitted:", obj);
+                  try {
+                    // Save appointment to database
+                    const appointmentData = {
+                      patient_id: obj.patient_id || null,
+                      service_id: obj.service || null,
+                      appointment_date: obj.date || null,
+                      appointment_time: obj.time || null,
+                      status: "scheduled",
+                      notes: obj.message || null
+                    };
 
-                  setSubmitted(true);
+                    const response = await fetch("/api/appointments", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                      },
+                      body: JSON.stringify(appointmentData),
+                    });
+
+                    if (response.ok) {
+                      console.log("Appointment submitted:", appointmentData);
+                      setSubmitted(true);
+                    } else {
+                      console.error("Failed to submit appointment");
+                    }
+                  } catch (error) {
+                    console.error("Error submitting appointment:", error);
+                  }
                 }}
               >
                 <div className="grid gap-5 sm:grid-cols-2">
@@ -378,17 +417,17 @@ export function AppointmentForm() {
                     >
                       Service
                     </Label>
-                    <Select required>
+                    <Select required disabled={loadingServices}>
                       <SelectTrigger
                         id="service"
                         className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                       >
-                        <SelectValue placeholder="Select a service" />
+                        <SelectValue placeholder={loadingServices ? "Loading services..." : "Select a service"} />
                       </SelectTrigger>
                       <SelectContent>
-                        {services.map((s) => (
-                          <SelectItem key={s} value={s}>
-                            {s}
+                        {services.map((service) => (
+                          <SelectItem key={service.id} value={service.service_name}>
+                            {service.service_name}
                           </SelectItem>
                         ))}
                       </SelectContent>

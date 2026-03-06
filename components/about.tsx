@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import {
   AnimateOnScroll,
@@ -9,37 +10,64 @@ import {
   scaleIn,
 } from "./motion";
 
-const doctors = [
-  {
-    name: "Dr. Ahmed ",
-    specialty: "BDS, MSc Periodontology",
-    image: "/images/doctor-5.jpg",
-  },
-  {
-    name: "Dr. Sharqa ",
-    specialty: "BDS, Orthodontics",
-    image: "/images/doctor-5.jpg",
-  },
-
-  {
-    name: "Dr. Saif Rasool",
-    specialty: "BDS",
-    image: "/images/doctor-7.jpg",
-  },
-
-  {
-    name: "Awais (Dental Assistant)",
-    specialty: "ASSISTANT",
-    image: "/images/doctor-7.jpg",
-  },
-  {
-    name: "Esha (Receptionist)",
-    specialty: "FRONT DESK",
-    image: "/images/doctor-6.jpg",
-  },
-];
+interface Dentist {
+  id: string;
+  name: string;
+  specialization: string;
+  profile_image: string;
+}
 
 export function About() {
+  const [doctors, setDoctors] = useState<Dentist[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Hardcoded images for Ahmed and Sharqa
+  const hardcodedImages: { [key: string]: string } = {
+    "ahmed": "ahmed.png",
+    "sharqa": "sharqa.png",
+  };
+
+  useEffect(() => {
+    const fetchDentists = async () => {
+      try {
+        const response = await fetch("/api/dentists");
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Update images for Ahmed and Sharqa if they exist
+          const updatedDoctors = data.map((doctor: Dentist) => {
+            const lowerName = doctor.name.toLowerCase();
+            for (const [key, imageName] of Object.entries(hardcodedImages)) {
+              if (lowerName.includes(key)) {
+                return { ...doctor, profile_image: imageName };
+              }
+            }
+            return doctor;
+          });
+          
+          setDoctors(updatedDoctors);
+        } else {
+          console.error("API Error:", response.status);
+          // Fallback to hardcoded doctors if API fails
+          setDoctors([
+            { id: "1", name: "Dr. Ahmed", specialization: "General Dentistry", profile_image: "ahmed.png" },
+            { id: "2", name: "Dr. Sharqa", specialization: "Orthodontics", profile_image: "sharqa.png" },
+          ]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dentists:", error);
+        // Fallback to hardcoded doctors if fetch fails
+        setDoctors([
+          { id: "1", name: "Dr. Ahmed", specialization: "General Dentistry", profile_image: "ahmed.png" },
+          { id: "2", name: "Dr. Sharqa", specialization: "Orthodontics", profile_image: "sharqa.png" },
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDentists();
+  }, []);
   return (
     <section id="about" className="bg-white py-20 lg:py-28">
       <div className="mx-auto max-w-7xl px-6">
@@ -94,56 +122,72 @@ export function About() {
           className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4"
           staggerDelay={0.15}
         >
-          {doctors.map((doctor) => (
-            <StaggerItem key={doctor.name} variants={scaleIn}>
-              <div
-                className="group relative overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
-                style={{ border: "1px solid #E8E3D3" }}
-              >
-                {/* Doctor Image */}
-                <div className="relative aspect-[3/4] w-full overflow-hidden">
-                  <Image
-                    src={doctor.image}
-                    alt={`${doctor.name}, ${doctor.specialty} at Dental Ease`}
-                    fill
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    style={{ filter: "saturate(0.9)" }}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
+          {loading ? (
+            <div className="col-span-full text-center py-8 text-gray-500">
+              Loading doctors...
+            </div>
+          ) : doctors.length === 0 ? (
+            <div className="col-span-full text-center py-8 text-gray-500">
+              No doctors available
+            </div>
+          ) : (
+            doctors.map((doctor) => (
+              <StaggerItem key={doctor.id} variants={scaleIn}>
+                <div
+                  className="group relative overflow-hidden rounded-lg bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-2"
+                  style={{ border: "1px solid #E8E3D3" }}
+                >
+                  {/* Doctor Image */}
+                  <div className="relative aspect-[3/4] w-full overflow-hidden">
+                    <Image
+                      src={
+                        doctor.profile_image
+                          ? doctor.profile_image.startsWith("/")
+                            ? doctor.profile_image
+                            : `/images/${doctor.profile_image}`
+                          : "/images/doctor-1.jpg"
+                      }
+                      alt={`${doctor.name}, ${doctor.specialization} at Dental Ease`}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-105"
+                      style={{ filter: "saturate(0.9)" }}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    />
                 </div>
 
                 {/* Doctor Info */}
-                <div
-                  className="relative p-6 text-center transition-all duration-300"
-                  style={{
-                    borderBottom: "3px solid transparent",
-                  }}
-                >
-                  {/* Gold border on hover - using pseudo element via wrapper */}
                   <div
-                    className="absolute bottom-0 left-0 h-[3px] w-full transition-all duration-300 opacity-0 group-hover:opacity-100"
-                    style={{ backgroundColor: "#BFA37C" }}
-                  />
-
-                  <h3
-                    className="text-lg font-bold"
+                    className="relative p-6 text-center transition-all duration-300"
                     style={{
-                      fontFamily: "var(--font-playfair), Georgia, serif",
-                      color: "#0A2342",
+                      borderBottom: "3px solid transparent",
                     }}
                   >
-                    {doctor.name}
-                  </h3>
-                  <p
-                    className="mt-1 text-xs font-medium uppercase tracking-widest"
-                    style={{ color: "#888888" }}
-                  >
-                    {doctor.specialty}
-                  </p>
+                    {/* Gold border on hover - using pseudo element via wrapper */}
+                    <div
+                      className="absolute bottom-0 left-0 h-[3px] w-full transition-all duration-300 opacity-0 group-hover:opacity-100"
+                      style={{ backgroundColor: "#BFA37C" }}
+                    />
+
+                    <h3
+                      className="text-lg font-bold"
+                      style={{
+                        fontFamily: "var(--font-playfair), Georgia, serif",
+                        color: "#0A2342",
+                      }}
+                    >
+                      {doctor.name}
+                    </h3>
+                    <p
+                      className="mt-1 text-xs font-medium uppercase tracking-widest"
+                      style={{ color: "#888888" }}
+                    >
+                      {doctor.specialization}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </StaggerItem>
-          ))}
+              </StaggerItem>
+            ))
+          )}
         </StaggerContainer>
 
         {/* View All Button */}

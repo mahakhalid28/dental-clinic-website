@@ -27,7 +27,7 @@ const stats = [
   },
   {
     icon: Award,
-    value: 15,
+    value: 3,
     suffix: "+",
     label: "Expert Dentists",
     description: "Board-certified specialists",

@@ -34,7 +34,7 @@ export function Header() {
       <div className="w-full bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           {/* Logo */}
-          <Link href="#home" className="flex items-center gap-3">
+          <Link href="/" className="flex items-center gap-3">
             <span
               className="text-2xl md:text-3xl font-semibold tracking-wide"
               style={{
@@ -51,14 +51,14 @@ export function Header() {
           <div className="hidden items-center gap-2 md:flex">
             <Phone className="h-4 w-4 text-[#BFA37C]" />
             <Link
-              href="tel:+15551234567"
+              href="tel:+923088402625"
               className="text-base font-medium transition-colors hover:text-[#BFA37C]"
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
                 color: "#333333",
               }}
             >
-              (555) 123-4567
+              03088402625
             </Link>
             <Link
               href="/admin/login"
@@ -129,7 +129,7 @@ export function Header() {
           </nav>
           <div className="mt-6 flex flex-col gap-4 border-t border-[#E8E3D3] pt-4">
             <Link
-              href="tel:+15551234567"
+              href="tel:+923088402625"
               className="flex items-center gap-2 text-sm font-medium"
               style={{
                 fontFamily: "'Inter', system-ui, sans-serif",
@@ -137,7 +137,7 @@ export function Header() {
               }}
             >
               <Phone className="h-4 w-4 text-[#BFA37C]" />
-              (555) 123-4567
+              03088402625
             </Link>
             <Link
               href="/admin/login"
