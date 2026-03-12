@@ -4,12 +4,38 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import {
   Calendar,
@@ -23,7 +49,7 @@ import {
   ArrowLeft,
   CheckCircle,
   XCircle,
-  AlertCircle
+  AlertCircle,
 } from "lucide-react";
 
 interface Appointment {
@@ -36,7 +62,7 @@ interface Appointment {
   status: string;
   notes: string | null;
   created_at: string;
-  patient?: { first_name: string; last_name: string; email: string; phone: string };
+  patient?: { name: string; email: string; phone: string };
   dentist?: { name: string };
   service?: { service_name: string };
 }
@@ -48,7 +74,8 @@ export default function AppointmentsManagement() {
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -60,7 +87,7 @@ export default function AppointmentsManagement() {
     appointment_date: "",
     appointment_time: "",
     status: "scheduled",
-    notes: ""
+    notes: "",
   });
 
   useEffect(() => {
@@ -69,16 +96,19 @@ export default function AppointmentsManagement() {
 
   const fetchAllData = async () => {
     try {
-      const [appointmentsRes, patientsRes, dentistsRes, servicesRes] = await Promise.all([
-        fetch("/api/appointments"),
-        fetch("/api/patients"),
-        fetch("/api/dentists"),
-        fetch("/api/services")
-      ]);
+      const [appointmentsRes, patientsRes, dentistsRes, servicesRes] =
+        await Promise.all([
+          fetch("/api/appointments"),
+          fetch("/api/patients"),
+          fetch("/api/dentists"),
+          fetch("/api/services"),
+        ]);
 
       if (appointmentsRes.ok) {
         const appointmentsData = await appointmentsRes.json();
-        setAppointments(Array.isArray(appointmentsData) ? appointmentsData : []);
+        setAppointments(
+          Array.isArray(appointmentsData) ? appointmentsData : [],
+        );
       } else {
         console.error("Failed to fetch appointments:", appointmentsRes.status);
         setAppointments([]);
@@ -104,15 +134,19 @@ export default function AppointmentsManagement() {
     }
   };
 
-  const filteredAppointments = appointments.filter(appointment => {
-    const matchesSearch = 
-      appointment.patient?.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.patient?.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.patient?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      appointment.patient?.phone?.includes(searchTerm);
-    
-    const matchesStatus = statusFilter === "all" || appointment.status === statusFilter;
-    
+  const filteredAppointments = appointments.filter((appointment) => {
+    const matchesSearch =
+      (appointment.patient?.name?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (appointment.patient?.email?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (appointment.patient?.phone || "").includes(searchTerm);
+
+    const matchesStatus =
+      statusFilter === "all" || appointment.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -125,7 +159,7 @@ export default function AppointmentsManagement() {
       appointment_date: appointment.appointment_date,
       appointment_time: appointment.appointment_time,
       status: appointment.status,
-      notes: appointment.notes || ""
+      notes: appointment.notes || "",
     });
     setIsEditing(true);
     setIsDialogOpen(true);
@@ -137,13 +171,16 @@ export default function AppointmentsManagement() {
     if (!selectedAppointment) return;
 
     try {
-      const response = await fetch(`/api/appointments/${selectedAppointment.id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        `/api/appointments/${selectedAppointment.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(formData),
         },
-        body: JSON.stringify(formData),
-      });
+      );
 
       if (response.ok) {
         fetchAllData();
@@ -179,7 +216,7 @@ export default function AppointmentsManagement() {
       appointment_date: "",
       appointment_time: "",
       status: "scheduled",
-      notes: ""
+      notes: "",
     });
     setSelectedAppointment(null);
     setIsEditing(false);
@@ -188,13 +225,29 @@ export default function AppointmentsManagement() {
   const getStatusBadge = (status: string) => {
     switch (status.toLowerCase()) {
       case "scheduled":
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Scheduled</Badge>;
+        return (
+          <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">
+            Scheduled
+          </Badge>
+        );
       case "completed":
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>;
+        return (
+          <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
+            Completed
+          </Badge>
+        );
       case "cancelled":
-        return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Cancelled</Badge>;
+        return (
+          <Badge className="bg-red-100 text-red-800 hover:bg-red-100">
+            Cancelled
+          </Badge>
+        );
       case "no-show":
-        return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">No Show</Badge>;
+        return (
+          <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">
+            No Show
+          </Badge>
+        );
       default:
         return <Badge variant="secondary">{status}</Badge>;
     }
@@ -231,7 +284,7 @@ export default function AppointmentsManagement() {
                 className="text-xl font-semibold"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#0A2342"
+                  color: "#0A2342",
                 }}
               >
                 Appointments Management
@@ -254,7 +307,7 @@ export default function AppointmentsManagement() {
                 className="pl-10 w-64"
               />
             </div>
-            
+
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Filter by status" />
@@ -277,7 +330,9 @@ export default function AppointmentsManagement() {
         {/* Appointments Table */}
         <Card>
           <CardHeader>
-            <CardTitle style={{ color: "#0A2342" }}>Appointment Records</CardTitle>
+            <CardTitle style={{ color: "#0A2342" }}>
+              Appointment Records
+            </CardTitle>
             <CardDescription>
               View and manage all scheduled appointments
             </CardDescription>
@@ -307,7 +362,7 @@ export default function AppointmentsManagement() {
                       <TableRow key={appointment.id}>
                         <TableCell className="font-medium">
                           <div>
-                            {appointment.patient?.first_name} {appointment.patient?.last_name}
+                            {appointment.patient?.name || "Unknown Patient"}
                           </div>
                           <div className="text-sm text-gray-500">
                             {appointment.patient?.phone}
@@ -316,7 +371,9 @@ export default function AppointmentsManagement() {
                         <TableCell>
                           <div className="flex items-center gap-1">
                             <Calendar className="h-3 w-3" />
-                            {new Date(appointment.appointment_date).toLocaleDateString()}
+                            {new Date(
+                              appointment.appointment_date,
+                            ).toLocaleDateString()}
                           </div>
                           <div className="flex items-center gap-1 text-sm">
                             <Clock className="h-3 w-3" />
@@ -336,13 +393,22 @@ export default function AppointmentsManagement() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="max-w-xs truncate" title={appointment.notes || ""}>
+                          <div
+                            className="max-w-xs truncate"
+                            title={appointment.notes || ""}
+                          >
                             {appointment.notes || "-"}
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex justify-end gap-2">
-                            <Dialog open={isDialogOpen && selectedAppointment?.id === appointment.id} onOpenChange={setIsDialogOpen}>
+                            <Dialog
+                              open={
+                                isDialogOpen &&
+                                selectedAppointment?.id === appointment.id
+                              }
+                              onOpenChange={setIsDialogOpen}
+                            >
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"
@@ -362,26 +428,49 @@ export default function AppointmentsManagement() {
                                   </DialogDescription>
                                 </DialogHeader>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
+                                <form
+                                  onSubmit={handleSubmit}
+                                  className="space-y-4"
+                                >
                                   <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                      <Label htmlFor="patient_id">Patient *</Label>
-                                      <Select value={formData.patient_id} onValueChange={(value) => setFormData({...formData, patient_id: value})}>
+                                      <Label htmlFor="patient_id">
+                                        Patient *
+                                      </Label>
+                                      <Select
+                                        value={formData.patient_id}
+                                        onValueChange={(value) =>
+                                          setFormData({
+                                            ...formData,
+                                            patient_id: value,
+                                          })
+                                        }
+                                      >
                                         <SelectTrigger>
                                           <SelectValue placeholder="Select patient" />
                                         </SelectTrigger>
                                         <SelectContent>
                                           {patients.map((p) => (
                                             <SelectItem key={p.id} value={p.id}>
-                                              {p.first_name} {p.last_name}
+                                              {p.name}
                                             </SelectItem>
                                           ))}
                                         </SelectContent>
                                       </Select>
                                     </div>
                                     <div>
-                                      <Label htmlFor="service_id">Service</Label>
-                                      <Select value={formData.service_id} onValueChange={(value) => setFormData({...formData, service_id: value})}>
+                                      <Label htmlFor="service_id">
+                                        Service
+                                      </Label>
+                                      <Select
+                                        value={formData.service_id}
+                                        onValueChange={(value) =>
+                                          setFormData({
+                                            ...formData,
+                                            service_id: value,
+                                          })
+                                        }
+                                      >
                                         <SelectTrigger>
                                           <SelectValue placeholder="Select service" />
                                         </SelectTrigger>
@@ -399,8 +488,18 @@ export default function AppointmentsManagement() {
 
                                   <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                      <Label htmlFor="dentist_id">Dentist</Label>
-                                      <Select value={formData.dentist_id} onValueChange={(value) => setFormData({...formData, dentist_id: value})}>
+                                      <Label htmlFor="dentist_id">
+                                        Dentist
+                                      </Label>
+                                      <Select
+                                        value={formData.dentist_id}
+                                        onValueChange={(value) =>
+                                          setFormData({
+                                            ...formData,
+                                            dentist_id: value,
+                                          })
+                                        }
+                                      >
                                         <SelectTrigger>
                                           <SelectValue placeholder="Select dentist" />
                                         </SelectTrigger>
@@ -416,15 +515,31 @@ export default function AppointmentsManagement() {
                                     </div>
                                     <div>
                                       <Label htmlFor="status">Status</Label>
-                                      <Select value={formData.status} onValueChange={(value) => setFormData({...formData, status: value})}>
+                                      <Select
+                                        value={formData.status}
+                                        onValueChange={(value) =>
+                                          setFormData({
+                                            ...formData,
+                                            status: value,
+                                          })
+                                        }
+                                      >
                                         <SelectTrigger>
                                           <SelectValue placeholder="Select status" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="scheduled">Scheduled</SelectItem>
-                                          <SelectItem value="completed">Completed</SelectItem>
-                                          <SelectItem value="cancelled">Cancelled</SelectItem>
-                                          <SelectItem value="no-show">No Show</SelectItem>
+                                          <SelectItem value="scheduled">
+                                            Scheduled
+                                          </SelectItem>
+                                          <SelectItem value="completed">
+                                            Completed
+                                          </SelectItem>
+                                          <SelectItem value="cancelled">
+                                            Cancelled
+                                          </SelectItem>
+                                          <SelectItem value="no-show">
+                                            No Show
+                                          </SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </div>
@@ -432,22 +547,36 @@ export default function AppointmentsManagement() {
 
                                   <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                      <Label htmlFor="appointment_date">Date *</Label>
+                                      <Label htmlFor="appointment_date">
+                                        Date *
+                                      </Label>
                                       <Input
                                         id="appointment_date"
                                         type="date"
                                         value={formData.appointment_date}
-                                        onChange={(e) => setFormData({...formData, appointment_date: e.target.value})}
+                                        onChange={(e) =>
+                                          setFormData({
+                                            ...formData,
+                                            appointment_date: e.target.value,
+                                          })
+                                        }
                                         required
                                       />
                                     </div>
                                     <div>
-                                      <Label htmlFor="appointment_time">Time *</Label>
+                                      <Label htmlFor="appointment_time">
+                                        Time *
+                                      </Label>
                                       <Input
                                         id="appointment_time"
                                         type="time"
                                         value={formData.appointment_time}
-                                        onChange={(e) => setFormData({...formData, appointment_time: e.target.value})}
+                                        onChange={(e) =>
+                                          setFormData({
+                                            ...formData,
+                                            appointment_time: e.target.value,
+                                          })
+                                        }
                                         required
                                       />
                                     </div>
@@ -458,17 +587,29 @@ export default function AppointmentsManagement() {
                                     <Textarea
                                       id="notes"
                                       value={formData.notes}
-                                      onChange={(e) => setFormData({...formData, notes: e.target.value})}
+                                      onChange={(e) =>
+                                        setFormData({
+                                          ...formData,
+                                          notes: e.target.value,
+                                        })
+                                      }
                                       rows={3}
                                       placeholder="Any additional notes about the appointment"
                                     />
                                   </div>
 
                                   <div className="flex justify-end gap-3 pt-4">
-                                    <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      onClick={() => setIsDialogOpen(false)}
+                                    >
                                       Cancel
                                     </Button>
-                                    <Button type="submit" style={{ backgroundColor: "#0A2342" }}>
+                                    <Button
+                                      type="submit"
+                                      style={{ backgroundColor: "#0A2342" }}
+                                    >
                                       Save Appointment
                                     </Button>
                                   </div>
@@ -497,11 +638,12 @@ export default function AppointmentsManagement() {
               <div className="text-center py-8">
                 <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-600">No appointments found</p>
-                {searchTerm || statusFilter !== "all" && (
-                  <p className="text-sm text-gray-500 mt-1">
-                    Try adjusting your filters
-                  </p>
-                )}
+                {searchTerm ||
+                  (statusFilter !== "all" && (
+                    <p className="text-sm text-gray-500 mt-1">
+                      Try adjusting your filters
+                    </p>
+                  ))}
               </div>
             )}
           </CardContent>

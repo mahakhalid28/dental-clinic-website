@@ -20,7 +20,7 @@ export async function GET() {
       const serviceIds = [...new Set(data.map(a => a.service_id).filter(Boolean))];
 
       const [patientsRes, dentistsRes, servicesRes] = await Promise.all([
-        patientIds.length > 0 ? supabase.from("patients").select("id, first_name, last_name, email, phone").in("id", patientIds) : Promise.resolve({ data: [] }),
+        patientIds.length > 0 ? supabase.from("patients").select("id, name, email, phone").in("id", patientIds) : Promise.resolve({ data: [] }),
         dentistIds.length > 0 ? supabase.from("dentists").select("id, name").in("id", dentistIds) : Promise.resolve({ data: [] }),
         serviceIds.length > 0 ? supabase.from("services").select("id, service_name").in("id", serviceIds) : Promise.resolve({ data: [] })
       ]);

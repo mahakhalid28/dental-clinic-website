@@ -1,9 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Users,
   Stethoscope,
@@ -13,11 +19,76 @@ import {
   BarChart3,
   Calendar,
   Settings,
-  Phone
+  Phone,
+  CreditCard,
+  MessageSquare,
+  Star,
 } from "lucide-react";
+
+interface DashboardStats {
+  patients: number;
+  dentists: number;
+  services: number;
+  appointments: number;
+  todayAppointments: number;
+  pendingAppointments: number;
+}
+
+interface Admin {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  role: string;
+}
 
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("dashboard");
+  const [admin, setAdmin] = useState<Admin | null>(null);
+  const [stats, setStats] = useState<DashboardStats>({
+    patients: 0,
+    dentists: 0,
+    services: 0,
+    appointments: 0,
+    todayAppointments: 0,
+    pendingAppointments: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Get admin from localStorage
+    const storedAdmin = localStorage.getItem("admin");
+    if (storedAdmin) {
+      setAdmin(JSON.parse(storedAdmin));
+    }
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    try {
+      const response = await fetch("/api/dashboard/stats");
+      if (response.ok) {
+        const data = await response.json();
+        setStats(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch stats:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/admin/logout", { method: "POST" });
+      localStorage.removeItem("admin");
+      window.location.href = "/admin/login";
+    } catch (error) {
+      console.error("Logout failed:", error);
+      localStorage.removeItem("admin");
+      window.location.href = "/admin/login";
+    }
+  };
 
   const menuItems = [
     {
@@ -25,50 +96,71 @@ export default function AdminDashboard() {
       label: "Dashboard",
       icon: BarChart3,
       href: "/admin",
-      description: "Overview and statistics"
+      description: "Overview and statistics",
     },
     {
       id: "patients",
       label: "Patients",
       icon: Users,
       href: "/admin/patients",
-      description: "Manage patient records"
+      description: "Manage patient records",
     },
     {
       id: "services",
       label: "Services",
       icon: Stethoscope,
       href: "/admin/services",
-      description: "Manage dental services"
+      description: "Manage dental services",
     },
     {
       id: "dentists",
       label: "Dentists",
       icon: UserCheck,
       href: "/admin/dentists",
-      description: "Manage dentist profiles"
+      description: "Manage dentist profiles",
     },
     {
       id: "about",
       label: "About Info",
       icon: FileText,
       href: "/admin/about",
-      description: "Manage clinic information"
+      description: "Manage clinic information",
     },
     {
       id: "contact",
       label: "Contact Details",
       icon: Phone,
       href: "/admin/contact",
-      description: "Manage contact information"
+      description: "Manage contact information",
     },
     {
       id: "appointments",
       label: "Appointments",
       icon: Calendar,
       href: "/admin/appointments",
-      description: "View appointment bookings"
-    }
+      description: "View appointment bookings",
+    },
+    {
+      id: "payments",
+      label: "Payments",
+      icon: CreditCard,
+      href: "/admin/payments",
+      description: "Manage payments",
+    },
+    {
+      id: "messages",
+      label: "Messages",
+      icon: MessageSquare,
+      href: "/admin/messages",
+      description: "Contact form messages",
+    },
+    {
+      id: "reviews",
+      label: "Reviews",
+      icon: Star,
+      href: "/admin/reviews",
+      description: "Patient reviews",
+    },
   ];
 
   return (
@@ -82,13 +174,18 @@ export default function AdminDashboard() {
                 className="text-2xl font-semibold"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#0A2342"
+                  color: "#0A2342",
                 }}
               >
                 Dental Ease Admin
               </div>
             </div>
             <div className="flex items-center gap-4">
+              {admin && (
+                <span className="text-sm text-gray-600">
+                  Welcome, {admin.first_name} {admin.last_name}
+                </span>
+              )}
               <Link
                 href="/"
                 className="text-sm text-gray-600 hover:text-[#0A2342] transition-colors"
@@ -99,10 +196,7 @@ export default function AdminDashboard() {
                 variant="outline"
                 size="sm"
                 className="flex items-center gap-2"
-                onClick={() => {
-                  // TODO: Implement logout
-                  window.location.href = '/admin/login';
-                }}
+                onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
                 Logout
@@ -121,9 +215,7 @@ export default function AdminDashboard() {
                 <CardTitle className="text-lg" style={{ color: "#0A2342" }}>
                   Admin Panel
                 </CardTitle>
-                <CardDescription>
-                  Manage your dental clinic
-                </CardDescription>
+                <CardDescription>Manage your dental clinic</CardDescription>
               </CardHeader>
               <CardContent className="space-y-2">
                 {menuItems.map((item) => {
@@ -134,15 +226,17 @@ export default function AdminDashboard() {
                       href={item.href}
                       className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
                         activeSection === item.id
-                          ? 'bg-[#0A2342] text-white'
-                          : 'hover:bg-gray-100 text-gray-700'
+                          ? "bg-[#0A2342] text-white"
+                          : "hover:bg-gray-100 text-gray-700"
                       }`}
                       onClick={() => setActiveSection(item.id)}
                     >
                       <Icon className="h-5 w-5" />
                       <div>
                         <div className="font-medium">{item.label}</div>
-                        <div className="text-xs opacity-75">{item.description}</div>
+                        <div className="text-xs opacity-75">
+                          {item.description}
+                        </div>
                       </div>
                     </Link>
                   );
@@ -166,8 +260,9 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-gray-600">
-                    Use the sidebar to navigate between different sections. You can view and edit patient records,
-                    manage services, update dentist information, and modify clinic details.
+                    Use the sidebar to navigate between different sections. You
+                    can view and edit patient records, manage services, update
+                    dentist information, and modify clinic details.
                   </p>
                 </CardContent>
               </Card>
@@ -181,7 +276,9 @@ export default function AdminDashboard() {
                         <Users className="h-6 w-6 text-blue-600" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">--</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {loading ? "--" : stats.patients}
+                        </p>
                         <p className="text-sm text-gray-600">Total Patients</p>
                       </div>
                     </div>
@@ -195,7 +292,9 @@ export default function AdminDashboard() {
                         <Stethoscope className="h-6 w-6 text-green-600" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">--</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {loading ? "--" : stats.services}
+                        </p>
                         <p className="text-sm text-gray-600">Active Services</p>
                       </div>
                     </div>
@@ -209,7 +308,9 @@ export default function AdminDashboard() {
                         <UserCheck className="h-6 w-6 text-purple-600" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">--</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {loading ? "--" : stats.dentists}
+                        </p>
                         <p className="text-sm text-gray-600">Dentists</p>
                       </div>
                     </div>
@@ -223,7 +324,9 @@ export default function AdminDashboard() {
                         <Calendar className="h-6 w-6 text-orange-600" />
                       </div>
                       <div>
-                        <p className="text-2xl font-bold text-gray-900">--</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {loading ? "--" : stats.appointments}
+                        </p>
                         <p className="text-sm text-gray-600">Appointments</p>
                       </div>
                     </div>
@@ -237,38 +340,51 @@ export default function AdminDashboard() {
                   <CardTitle style={{ color: "#0A2342" }}>
                     Quick Actions
                   </CardTitle>
-                  <CardDescription>
-                    Common administrative tasks
-                  </CardDescription>
+                  <CardDescription>Common administrative tasks</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <Link href="/admin/patients">
-                      <Button className="w-full justify-start gap-2" variant="outline">
+                      <Button
+                        className="w-full justify-start gap-2"
+                        variant="outline"
+                      >
                         <Users className="h-4 w-4" />
                         Manage Patients
                       </Button>
                     </Link>
                     <Link href="/admin/services">
-                      <Button className="w-full justify-start gap-2" variant="outline">
+                      <Button
+                        className="w-full justify-start gap-2"
+                        variant="outline"
+                      >
                         <Stethoscope className="h-4 w-4" />
                         Manage Services
                       </Button>
                     </Link>
                     <Link href="/admin/dentists">
-                      <Button className="w-full justify-start gap-2" variant="outline">
+                      <Button
+                        className="w-full justify-start gap-2"
+                        variant="outline"
+                      >
                         <UserCheck className="h-4 w-4" />
                         Manage Dentists
                       </Button>
                     </Link>
                     <Link href="/admin/about">
-                      <Button className="w-full justify-start gap-2" variant="outline">
+                      <Button
+                        className="w-full justify-start gap-2"
+                        variant="outline"
+                      >
                         <FileText className="h-4 w-4" />
                         Edit About Info
                       </Button>
                     </Link>
                     <Link href="/admin/contact">
-                      <Button className="w-full justify-start gap-2" variant="outline">
+                      <Button
+                        className="w-full justify-start gap-2"
+                        variant="outline"
+                      >
                         <Phone className="h-4 w-4" />
                         Manage Contact Details
                       </Button>

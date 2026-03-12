@@ -4,9 +4,29 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +38,7 @@ import {
   Trash2,
   GraduationCap,
   Award,
-  ArrowLeft
+  ArrowLeft,
 } from "lucide-react";
 
 interface Dentist {
@@ -47,7 +67,7 @@ export default function DentistsManagement() {
     experience_years: "",
     qualifications: "",
     bio: "",
-    image: ""
+    image: "",
   });
 
   useEffect(() => {
@@ -68,22 +88,29 @@ export default function DentistsManagement() {
     }
   };
 
-  const filteredDentists = dentists.filter(dentist =>
-    dentist.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dentist.specialization.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    dentist.qualifications.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredDentists = dentists.filter(
+    (dentist) =>
+      (dentist.name?.toLowerCase() || "").includes(searchTerm.toLowerCase()) ||
+      (dentist.specialization?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ) ||
+      (dentist.qualifications?.toLowerCase() || "").includes(
+        searchTerm.toLowerCase(),
+      ),
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
-      const url = isEditing ? `/api/dentists/${selectedDentist?.id}` : "/api/dentists";
+      const url = isEditing
+        ? `/api/dentists/${selectedDentist?.id}`
+        : "/api/dentists";
       const method = isEditing ? "PUT" : "POST";
 
       const submitData = {
         ...formData,
-        experience_years: parseInt(formData.experience_years) || 0
+        experience_years: parseInt(formData.experience_years) || 0,
       };
 
       const response = await fetch(url, {
@@ -112,7 +139,7 @@ export default function DentistsManagement() {
       experience_years: dentist.experience_years?.toString() || "",
       qualifications: dentist.qualifications,
       bio: dentist.bio,
-      image: dentist.image || ""
+      image: dentist.image || "",
     });
     setIsEditing(true);
     setIsDialogOpen(true);
@@ -141,7 +168,7 @@ export default function DentistsManagement() {
       experience_years: "",
       qualifications: "",
       bio: "",
-      image: ""
+      image: "",
     });
     setSelectedDentist(null);
     setIsEditing(false);
@@ -170,7 +197,7 @@ export default function DentistsManagement() {
                 className="text-xl font-semibold"
                 style={{
                   fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#0A2342"
+                  color: "#0A2342",
                 }}
               >
                 Dentists Management
@@ -200,7 +227,11 @@ export default function DentistsManagement() {
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
-              <Button onClick={openAddDialog} className="flex items-center gap-2" style={{ backgroundColor: "#0A2342" }}>
+              <Button
+                onClick={openAddDialog}
+                className="flex items-center gap-2"
+                style={{ backgroundColor: "#0A2342" }}
+              >
                 <Plus className="h-4 w-4" />
                 Add Dentist
               </Button>
@@ -211,7 +242,9 @@ export default function DentistsManagement() {
                   {isEditing ? "Edit Dentist" : "Add New Dentist"}
                 </DialogTitle>
                 <DialogDescription>
-                  {isEditing ? "Update dentist information" : "Enter dentist details"}
+                  {isEditing
+                    ? "Update dentist information"
+                    : "Enter dentist details"}
                 </DialogDescription>
               </DialogHeader>
 
@@ -221,7 +254,9 @@ export default function DentistsManagement() {
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, name: e.target.value })
+                    }
                     required
                   />
                 </div>
@@ -232,18 +267,30 @@ export default function DentistsManagement() {
                     <Input
                       id="specialization"
                       value={formData.specialization}
-                      onChange={(e) => setFormData({...formData, specialization: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          specialization: e.target.value,
+                        })
+                      }
                       placeholder="e.g., General Dentistry"
                       required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="experience_years">Years of Experience</Label>
+                    <Label htmlFor="experience_years">
+                      Years of Experience
+                    </Label>
                     <Input
                       id="experience_years"
                       type="number"
                       value={formData.experience_years}
-                      onChange={(e) => setFormData({...formData, experience_years: e.target.value})}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          experience_years: e.target.value,
+                        })
+                      }
                       placeholder="5"
                     />
                   </div>
@@ -254,7 +301,12 @@ export default function DentistsManagement() {
                   <Textarea
                     id="qualifications"
                     value={formData.qualifications}
-                    onChange={(e) => setFormData({...formData, qualifications: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        qualifications: e.target.value,
+                      })
+                    }
                     rows={3}
                     placeholder="e.g., DDS, University of Dentistry, Board Certified"
                     required
@@ -266,18 +318,24 @@ export default function DentistsManagement() {
                   <Textarea
                     id="bio"
                     value={formData.bio}
-                    onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, bio: e.target.value })
+                    }
                     rows={4}
                     placeholder="Brief professional biography and approach to patient care"
                   />
                 </div>
 
                 <div>
-                  <Label htmlFor="image">Profile Image Filename (optional)</Label>
+                  <Label htmlFor="image">
+                    Profile Image Filename (optional)
+                  </Label>
                   <Input
                     id="image"
                     value={formData.image}
-                    onChange={(e) => setFormData({...formData, image: e.target.value})}
+                    onChange={(e) =>
+                      setFormData({ ...formData, image: e.target.value })
+                    }
                     placeholder="e.g., doctor-1.jpg"
                   />
                   <p className="text-sm text-gray-500 mt-1">
@@ -286,7 +344,11 @@ export default function DentistsManagement() {
                 </div>
 
                 <div className="flex justify-end gap-3 pt-4">
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
                     Cancel
                   </Button>
                   <Button type="submit" style={{ backgroundColor: "#0A2342" }}>
@@ -346,7 +408,10 @@ export default function DentistsManagement() {
                         )}
                       </TableCell>
                       <TableCell>
-                        <div className="max-w-xs truncate" title={dentist.qualifications}>
+                        <div
+                          className="max-w-xs truncate"
+                          title={dentist.qualifications}
+                        >
                           {dentist.qualifications}
                         </div>
                       </TableCell>

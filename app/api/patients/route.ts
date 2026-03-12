@@ -24,6 +24,7 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const body = await request.json();
+    console.log("Patient POST body:", body);
 
     const { data, error } = await supabase
       .from("patients")
@@ -32,11 +33,13 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
+      console.log("Supabase patients error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
+    console.log("Catch error:", error);
     return NextResponse.json(
       { error: "Failed to create patient" },
       { status: 500 }

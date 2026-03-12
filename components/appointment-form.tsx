@@ -324,7 +324,7 @@ export function AppointmentForm() {
                       appointment_date: obj.date || null,
                       appointment_time: obj.time || null,
                       status: "scheduled",
-                      notes: obj.message || null
+                      notes: obj.message || null,
                     };
 
                     const response = await fetch("/api/appointments", {
@@ -422,11 +422,17 @@ export function AppointmentForm() {
                         id="service"
                         className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                       >
-                        <SelectValue placeholder={loadingServices ? "Loading services..." : "Select a service"} />
+                        <SelectValue
+                          placeholder={
+                            loadingServices
+                              ? "Loading services..."
+                              : "Select a service"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {services.map((service) => (
-                          <SelectItem key={service.id} value={service.service_name}>
+                          <SelectItem key={service.id} value={service.id}>
                             {service.service_name}
                           </SelectItem>
                         ))}
