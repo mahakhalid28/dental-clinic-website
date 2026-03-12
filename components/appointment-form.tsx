@@ -53,6 +53,7 @@ export function AppointmentForm() {
   const [submitted, setSubmitted] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
+  const [selectedTime, setSelectedTime] = useState("");
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -339,7 +340,9 @@ export function AppointmentForm() {
                       console.log("Appointment submitted:", appointmentData);
                       setSubmitted(true);
                     } else {
-                      console.error("Failed to submit appointment");
+                      const errorData = await response.json();
+                      console.error("Failed to submit appointment:", errorData);
+                      alert(errorData.error || "Failed to submit appointment");
                     }
                   } catch (error) {
                     console.error("Error submitting appointment:", error);
@@ -450,6 +453,7 @@ export function AppointmentForm() {
                     <div className="relative">
                       <Input
                         id="date"
+                        name="date"
                         type="date"
                         required
                         className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
@@ -466,7 +470,11 @@ export function AppointmentForm() {
                       Preferred Time
                     </Label>
                     <div className="relative">
-                      <Select required>
+                      <Select
+                        required
+                        value={selectedTime}
+                        onValueChange={setSelectedTime}
+                      >
                         <SelectTrigger
                           id="time"
                           className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
@@ -481,6 +489,7 @@ export function AppointmentForm() {
                           ))}
                         </SelectContent>
                       </Select>
+                      <input type="hidden" name="time" value={selectedTime} />
                       <Clock className="pointer-events-none absolute right-10 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     </div>
                   </div>
