@@ -52,6 +52,8 @@ export function About() {
           setDoctors([
             { id: "1", name: "Dr. Ahmed", specialization: "General Dentistry", profile_image: "ahmed.png" },
             { id: "2", name: "Dr. Sharqa", specialization: "Orthodontics", profile_image: "sharqa.png" },
+                                { id: "3", name: "Dr. Saif", specialization: "BDS", profile_image: "saif.png" }
+
           ]);
         }
       } catch (error) {
@@ -60,6 +62,7 @@ export function About() {
         setDoctors([
           { id: "1", name: "Dr. Ahmed", specialization: "General Dentistry", profile_image: "ahmed.png" },
           { id: "2", name: "Dr. Sharqa", specialization: "Orthodontics", profile_image: "sharqa.png" },
+                    { id: "3", name: "Dr. Saif", specialization: "BDS", profile_image: "saif.png" }
         ]);
       } finally {
         setLoading(false);

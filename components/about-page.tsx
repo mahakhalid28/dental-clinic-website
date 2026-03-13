@@ -49,7 +49,7 @@ const teamMembers = [
     specialty: "General Dentistry",
     experience: "Dentist",
     education: "BDS",
-    image: "/images/doctor-3.jpg",
+    image: "/images/saif.png",
     description:
       "Dr. Saif provides comprehensive general dental care including check-ups, fillings, and preventive treatments to maintain your oral health.",
   },

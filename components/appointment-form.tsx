@@ -210,12 +210,7 @@ export function AppointmentForm() {
                     icon: Users,
                     title: "Expert Care",
                     desc: "3+ experienced dentists",
-                  },
-                  {
-                    icon: Award,
-                    title: "Award Winning",
-                    desc: "Best dental clinic 2025",
-                  },
+                  }
                 ].map((item) => (
                   <div
                     key={item.title}

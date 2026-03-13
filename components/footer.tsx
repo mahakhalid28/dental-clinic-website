@@ -5,11 +5,9 @@ import Link from "next/link";
 
 const footerNav = {
   Company: [
-    { label: "About Us", href: "#about" },
-    { label: "Our Team", href: "#about" },
-    { label: "Testimonials", href: "#testimonials" },
-    { label: "Careers", href: "#" },
-  ],
+    { label: "About Us", href: "/about" },
+    { label: "Our Team", href: "/about" },
+    { label: "Testimonials", href: "/#testimonials" }  ],
   Support: [
     { label: "Book Appointment", href: "#appointment" },
     { label: "Contact Us", href: "#contact" },
@@ -162,14 +160,14 @@ export function Footer() {
           </p>
           <div className="flex gap-6">
             <Link
-              href="#"
+              href="/privacy-policy"
               className="text-lg transition-colors duration-200 hover:text-[#BFA37C]"
               style={{ color: "rgba(255, 255, 255, 0.7)" }}
             >
               Privacy Policy
             </Link>
             <Link
-              href="#"
+              href="/terms-of-service"
               className="text-lg transition-colors duration-200 hover:text-[#BFA37C]"
               style={{ color: "rgba(255, 255, 255, 0.7)" }}
             >
