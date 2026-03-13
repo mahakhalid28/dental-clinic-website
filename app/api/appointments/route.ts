@@ -54,18 +54,58 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    const { data, error } = await supabase
+    // 1. Upsert the Patient first
+    // This looks for a patient with the same email. 
+    // If found, it updates them; if not, it creates a new one.
+    const { data: patient, error: patientError } = await supabase
+      .from("patients")
+      .upsert(
+        {
+          name: body.name,
+          email: body.email,
+          phone: body.phone,
+          city: body.city,
+          history_diabetes: body.history_diabetes,
+          history_heart: body.history_heart,
+          history_hypertension: body.history_hypertension,
+          history_bleeding: body.history_bleeding,
+          history_smoker: body.history_smoker,
+          history_pregnant: body.history_pregnant,
+          allergies: body.allergies,
+          current_medications: body.current_medications,
+        },
+        { onConflict: "email" }
+      )
+      .select("id")
+      .single();
+
+    if (patientError) {
+      console.error("Patient handling error:", patientError);
+      return NextResponse.json({ error: patientError.message }, { status: 400 });
+    }
+
+    // 2. Insert the Appointment using the ID we just got from step 1
+    const { data: appointment, error: appointmentError } = await supabase
       .from("appointments")
-      .insert([body])
+      .insert([
+        {
+          patient_id: patient.id, // This links the appointment to the patient
+          service_id: body.service_id,
+          appointment_date: body.appointment_date,
+          appointment_time: body.appointment_time,
+          notes: body.notes,
+          status: "scheduled",
+        },
+      ])
       .select()
       .single();
 
-    if (error) {
-      console.error("Supabase error:", error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (appointmentError) {
+      console.error("Appointment insert error:", appointmentError);
+      return NextResponse.json({ error: appointmentError.message }, { status: 500 });
     }
 
-    return NextResponse.json(data, { status: 201 });
+    return NextResponse.json(appointment, { status: 201 });
   } catch (error) {
     console.error("API error:", error);
     return NextResponse.json(

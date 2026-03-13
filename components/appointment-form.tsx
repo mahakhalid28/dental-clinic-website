@@ -54,6 +54,8 @@ export function AppointmentForm() {
   const [services, setServices] = useState<Service[]>([]);
   const [loadingServices, setLoadingServices] = useState(true);
   const [selectedTime, setSelectedTime] = useState("");
+  // FIX 1: State must be INSIDE the function
+  const [selectedService, setSelectedService] = useState("");
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -69,7 +71,6 @@ export function AppointmentForm() {
         setLoadingServices(false);
       }
     };
-
     fetchServices();
   }, []);
 
@@ -106,8 +107,7 @@ export function AppointmentForm() {
             style={{ color: "rgba(255,255,255,0.8)" }}
           >
             Thank you for choosing Pearlshine Dental. Our team will reach out
-            within 24 hours to confirm your appointment. We look forward to
-            seeing you!
+            within 24 hours to confirm your appointment.
           </p>
           <button
             className="mt-8 px-8 py-3 rounded-full font-semibold transition-all duration-300"
@@ -133,7 +133,6 @@ export function AppointmentForm() {
           "linear-gradient(135deg, #0A2342 0%, #0D2B4D 50%, #0A2342 100%)",
       }}
     >
-      {/* Decorative background elements */}
       <div
         className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-10 blur-3xl"
         style={{
@@ -146,21 +145,10 @@ export function AppointmentForm() {
           background: "radial-gradient(circle, #BFA37C 0%, transparent 60%)",
         }}
       />
-      {/* Gold accent line at top */}
-      <div
-        className="absolute top-0 left-0 right-0 h-1"
-        style={{
-          background:
-            "linear-gradient(90deg, transparent 0%, #BFA37C 50%, transparent 100%)",
-        }}
-      />
-
       <div className="mx-auto max-w-7xl px-6 relative z-10">
         <div className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-start">
-          {/* Left Column - Benefits & Info */}
           <AnimateOnScroll variants={fadeInUp} className="lg:col-span-2">
             <div className="sticky top-8">
-              {/* Badge */}
               <span
                 className="inline-block px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-6"
                 style={{
@@ -171,8 +159,6 @@ export function AppointmentForm() {
               >
                 Book Your Visit
               </span>
-
-              {/* Main Heading */}
               <h2
                 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
                 style={{
@@ -181,19 +167,15 @@ export function AppointmentForm() {
                   lineHeight: "1.2",
                 }}
               >
-                Schedule Your
+                Schedule Your{" "}
                 <span style={{ color: "#BFA37C" }}> Perfect Smile</span>
               </h2>
-
               <p
                 className="text-base mb-10 leading-relaxed"
                 style={{ color: "rgba(255,255,255,0.7)" }}
               >
-                Take the first step towards exceptional dental care. Our team is
-                ready to provide you with a personalized experience.
+                Take the first step towards exceptional dental care.
               </p>
-
-              {/* Trust Indicators */}
               <div className="space-y-5">
                 {[
                   {
@@ -210,7 +192,7 @@ export function AppointmentForm() {
                     icon: Users,
                     title: "Expert Care",
                     desc: "3+ experienced dentists",
-                  }
+                  },
                 ].map((item) => (
                   <div
                     key={item.title}
@@ -239,34 +221,9 @@ export function AppointmentForm() {
                   </div>
                 ))}
               </div>
-
-              {/* Quick Contact */}
-              <div
-                className="mt-10 p-5 rounded-2xl"
-                style={{
-                  background: "rgba(255,255,255,0.05)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                }}
-              >
-                <p
-                  className="text-sm mb-3"
-                  style={{ color: "rgba(255,255,255,0.7)" }}
-                >
-                  Prefer to talk? Call us directly:
-                </p>
-                <a
-                  href="tel:03088402625"
-                  className="flex items-center gap-3 text-xl font-bold transition-colors hover:opacity-80"
-                  style={{ color: "#BFA37C" }}
-                >
-                  <Phone className="w-5 h-5" />
-                  0308-8402625
-                </a>
-              </div>
             </div>
           </AnimateOnScroll>
 
-          {/* Right Column - Form Card */}
           <AnimateOnScroll
             variants={scaleIn}
             delay={0.2}
@@ -280,7 +237,6 @@ export function AppointmentForm() {
                   "0 25px 80px -20px rgba(0,0,0,0.4), 0 0 0 1px rgba(191, 163, 124, 0.2)",
               }}
             >
-              {/* Form Header */}
               <div className="mb-8 text-center">
                 <h3
                   className="text-2xl font-bold mb-2"
@@ -299,397 +255,176 @@ export function AppointmentForm() {
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
-
                   const form = e.currentTarget as HTMLFormElement;
                   const fd = new FormData(form);
-                  const obj: Record<string, any> = {};
-                  fd.forEach((value, key) => {
-                    if (obj[key]) {
-                      if (Array.isArray(obj[key])) obj[key].push(value);
-                      else obj[key] = [obj[key], value];
-                    } else {
-                      obj[key] = value;
-                    }
-                  });
-
+                  const payload = {
+                    name: `${fd.get("firstName")} ${fd.get("lastName")}`.trim(),
+                    email: fd.get("email"),
+                    phone: fd.get("phone"),
+                    service_id: fd.get("service"),
+                    appointment_date: fd.get("date"),
+                    appointment_time: selectedTime,
+                    notes: fd.get("message"),
+                    history_diabetes: fd.get("history_diabetes") === "yes",
+                    history_heart: fd.get("history_heart") === "yes",
+                    history_hypertension:
+                      fd.get("history_hypertension") === "yes",
+                    history_bleeding: fd.get("history_bleeding") === "yes",
+                    history_smoker: fd.get("history_smoker") === "yes",
+                    history_pregnant: fd.get("history_pregnant") === "yes",
+                    allergies: fd.get("allergies") || "",
+                    current_medications: fd.get("medications") || "",
+                  };
                   try {
-                    // Save appointment to database
-                    const appointmentData = {
-                      patient_id: obj.patient_id || null,
-                      service_id: obj.service || null,
-                      appointment_date: obj.date || null,
-                      appointment_time: obj.time || null,
-                      status: "scheduled",
-                      notes: obj.message || null,
-                    };
-
-                    const response = await fetch("/api/appointments", {
+                    const res = await fetch("/api/appointments", {
                       method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify(appointmentData),
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify(payload),
                     });
-
-                    if (response.ok) {
-                      console.log("Appointment submitted:", appointmentData);
-                      setSubmitted(true);
-                    } else {
-                      const errorData = await response.json();
-                      console.error("Failed to submit appointment:", errorData);
-                      alert(errorData.error || "Failed to submit appointment");
-                    }
-                  } catch (error) {
-                    console.error("Error submitting appointment:", error);
+                    if (res.ok) setSubmitted(true);
+                  } catch (err) {
+                    console.error(err);
                   }
                 }}
               >
                 <div className="grid gap-5 sm:grid-cols-2">
                   <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="firstName"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      First Name
-                    </Label>
+                    <Label htmlFor="firstName">First Name</Label>
                     <Input
                       id="firstName"
+                      name="firstName"
                       placeholder="Jane"
                       required
-                      className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="lastName"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Last Name
-                    </Label>
+                    <Label htmlFor="lastName">Last Name</Label>
                     <Input
                       id="lastName"
+                      name="lastName"
                       placeholder="Doe"
                       required
-                      className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="email"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Email
-                    </Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
                       id="email"
+                      name="email"
                       type="email"
                       placeholder="jane@example.com"
                       required
-                      className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                     />
                   </div>
                   <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="phone"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Phone
-                    </Label>
+                    <Label htmlFor="phone">Phone</Label>
                     <Input
                       id="phone"
+                      name="phone"
                       type="tel"
                       placeholder="(555) 000-0000"
                       required
-                      className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                     />
                   </div>
+
                   <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="service"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Service
-                    </Label>
-                    <Select required disabled={loadingServices}>
-                      <SelectTrigger
-                        id="service"
-                        className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
-                      >
+                    <Label htmlFor="service">Service</Label>
+                    <Select required onValueChange={setSelectedService}>
+                      <SelectTrigger id="service">
                         <SelectValue
                           placeholder={
-                            loadingServices
-                              ? "Loading services..."
-                              : "Select a service"
+                            loadingServices ? "Loading..." : "Select a service"
                           }
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {services.map((service) => (
-                          <SelectItem key={service.id} value={service.id}>
-                            {service.service_name}
+                        {services.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.service_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="date"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Preferred Date
-                    </Label>
-                    <div className="relative">
-                      <Input
-                        id="date"
-                        name="date"
-                        type="date"
-                        required
-                        className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
-                      />
-                      <CalendarDays className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="time"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Preferred Time
-                    </Label>
-                    <div className="relative">
-                      <Select
-                        required
-                        value={selectedTime}
-                        onValueChange={setSelectedTime}
-                      >
-                        <SelectTrigger
-                          id="time"
-                          className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
-                        >
-                          <SelectValue placeholder="Select a time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map((t) => (
-                            <SelectItem key={t} value={t}>
-                              {t}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <input type="hidden" name="time" value={selectedTime} />
-                      <Clock className="pointer-events-none absolute right-10 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    </div>
-                  </div>
-                  <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="insurance"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Insurance Provider
-                    </Label>
-                    <Input
-                      id="insurance"
-                      placeholder="e.g. Blue Cross"
-                      className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
+                    <input
+                      type="hidden"
+                      name="service"
+                      value={selectedService}
                     />
                   </div>
-                  <div className="flex flex-col gap-2 sm:col-span-2">
-                    <Label
-                      htmlFor="message"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="date">Preferred Date</Label>
+                    <div className="relative">
+                      <Input id="date" name="date" type="date" required />
+                      <CalendarDays className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="time">Preferred Time</Label>
+                    <Select
+                      required
+                      value={selectedTime}
+                      onValueChange={setSelectedTime}
                     >
-                      Additional Notes
-                    </Label>
+                      <SelectTrigger id="time">
+                        <SelectValue placeholder="Select a time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlots.map((t) => (
+                          <SelectItem key={t} value={t}>
+                            {t}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <input type="hidden" name="time" value={selectedTime} />
+                  </div>
+
+                  <div className="flex flex-col gap-2 sm:col-span-2">
+                    <Label htmlFor="message">Additional Notes</Label>
                     <Textarea
                       id="message"
-                      placeholder="Any concerns or special requests..."
+                      name="message"
+                      placeholder="Any concerns..."
                       rows={4}
-                      className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
                     />
                   </div>
 
-                  {/* Medical History Section */}
                   <div className="flex flex-col gap-4 sm:col-span-2 mt-4">
-                    <h3
-                      className="text-sm font-semibold"
-                      style={{ color: "#0A2342" }}
-                    >
-                      Medical History (check all that apply)
-                    </h3>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name="history_diabetes"
-                          value="yes"
-                          className="h-4 w-4"
-                        />
-                        <span className="text-sm" style={{ color: "#555555" }}>
-                          Diabetes
-                        </span>
-                      </label>
-
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name="history_heart"
-                          value="yes"
-                          className="h-4 w-4"
-                        />
-                        <span className="text-sm" style={{ color: "#555555" }}>
-                          Heart Disease
-                        </span>
-                      </label>
-
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name="history_hypertension"
-                          value="yes"
-                          className="h-4 w-4"
-                        />
-                        <span className="text-sm" style={{ color: "#555555" }}>
-                          Hypertension
-                        </span>
-                      </label>
-
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name="history_bleeding"
-                          value="yes"
-                          className="h-4 w-4"
-                        />
-                        <span className="text-sm" style={{ color: "#555555" }}>
-                          Bleeding Disorders
-                        </span>
-                      </label>
-
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name="history_smoker"
-                          value="yes"
-                          className="h-4 w-4"
-                        />
-                        <span className="text-sm" style={{ color: "#555555" }}>
-                          Smoker
-                        </span>
-                      </label>
-
-                      <label className="flex items-center gap-3">
-                        <input
-                          type="checkbox"
-                          name="history_pregnant"
-                          value="yes"
-                          className="h-4 w-4"
-                        />
-                        <span className="text-sm" style={{ color: "#555555" }}>
-                          Pregnant
-                        </span>
-                      </label>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="flex flex-col gap-2">
-                        <Label
-                          htmlFor="allergies"
-                          className="text-sm font-medium"
-                          style={{ color: "#0A2342" }}
-                        >
-                          Allergies (if any)
-                        </Label>
-                        <Input
-                          id="allergies"
-                          name="allergies"
-                          placeholder="e.g. Penicillin, Latex"
-                          className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
-                        />
-                      </div>
-
-                      <div className="flex flex-col gap-2">
-                        <Label
-                          htmlFor="medications"
-                          className="text-sm font-medium"
-                          style={{ color: "#0A2342" }}
-                        >
-                          Current Medications
-                        </Label>
-                        <Input
-                          id="medications"
-                          name="medications"
-                          placeholder="List current medications"
-                          className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
-                        />
-                      </div>
+                    <h3 className="text-sm font-semibold">Medical History</h3>
+                    <div className="grid grid-cols-2 gap-3">
+                      {[
+                        "diabetes",
+                        "heart",
+                        "hypertension",
+                        "bleeding",
+                        "smoker",
+                        "pregnant",
+                      ].map((item) => (
+                        <label key={item} className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            name={`history_${item}`}
+                            value="yes"
+                            className="h-4 w-4"
+                          />
+                          <span className="text-sm capitalize">
+                            {item.replace("_", " ")}
+                          </span>
+                        </label>
+                      ))}
                     </div>
                   </div>
                 </div>
 
-                {/* Premium Submit Button */}
                 <div className="mt-10">
                   <button
                     type="submit"
-                    className="w-full py-4 rounded-xl text-base font-bold uppercase tracking-wider transition-all duration-300 relative overflow-hidden group"
-                    style={{
-                      background:
-                        "linear-gradient(135deg, #0A2342 0%, #0D2B4D 100%)",
-                      color: "#FFFFFF",
-                      boxShadow: "0 8px 30px -10px rgba(10, 35, 66, 0.4)",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-2px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 12px 40px -10px rgba(10, 35, 66, 0.5)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow =
-                        "0 8px 30px -10px rgba(10, 35, 66, 0.4)";
-                    }}
+                    className="w-full py-4 rounded-xl text-base font-bold uppercase tracking-wider bg-[#0A2342] text-white"
                   >
-                    <span className="relative z-10 flex items-center justify-center gap-3">
-                      <CalendarDays
-                        className="w-5 h-5"
-                        style={{ color: "#BFA37C" }}
-                      />
-                      Request Appointment
-                      <svg
-                        className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1"
-                        style={{ color: "#BFA37C" }}
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M17 8l4 4m0 0l-4 4m4-4H3"
-                        />
-                      </svg>
-                    </span>
+                    Request Appointment
                   </button>
-
-                  {/* Trust note below button */}
-                  <p
-                    className="text-center mt-4 text-xs"
-                    style={{ color: "#9CA3AF" }}
-                  >
-                    <Shield className="w-3 h-3 inline-block mr-1" />
-                    Your information is 100% secure and will never be shared
-                  </p>
                 </div>
               </form>
             </div>
