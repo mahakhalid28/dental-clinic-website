@@ -18,7 +18,6 @@ import {
   LogOut,
   BarChart3,
   Calendar,
-  Settings,
   Phone,
   CreditCard,
   MessageSquare,
@@ -56,7 +55,6 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Get admin from localStorage
     const storedAdmin = localStorage.getItem("admin");
     if (storedAdmin) {
       setAdmin(JSON.parse(storedAdmin));
@@ -164,38 +162,48 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div
+      className="min-h-screen"
+      style={{
+        background:
+          "linear-gradient(135deg, #0A2342 0%, #0D2B4D 50%, #0A2342 100%)",
+      }}
+    >
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header
+        className="shadow-sm"
+        style={{
+          background: "linear-gradient(135deg, #0A2342 0%, #0D2B4D 100%)",
+          borderBottom: "1px solid rgba(191,163,124,0.2)",
+        }}
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center gap-3">
-              <div
-                className="text-2xl font-semibold"
-                style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#0A2342",
-                }}
-              >
-                Dental Ease Admin
-              </div>
+            <div
+              className="text-2xl font-semibold text-white"
+              style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
+            >
+              Dental Ease Admin
             </div>
+
             <div className="flex items-center gap-4">
               {admin && (
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-gray-200">
                   Welcome, {admin.first_name} {admin.last_name}
                 </span>
               )}
+
               <Link
                 href="/"
-                className="text-sm text-gray-600 hover:text-[#0A2342] transition-colors"
+                className="text-sm text-gray-200 hover:text-[#BFA37C] transition-colors"
               >
                 ← Back to Website
               </Link>
+
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 border-[#BFA37C] text-[#0A2342]"
                 onClick={handleLogout}
               >
                 <LogOut className="h-4 w-4" />
@@ -206,32 +214,58 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <Card>
+            <Card
+              className="border-0"
+              style={{
+                background: "linear-gradient(180deg,#FFFFFF 0%,#FAF8F5 100%)",
+                boxShadow:
+                  "0 20px 60px -10px rgba(0,0,0,0.35),0 0 0 1px rgba(191,163,124,0.2)",
+              }}
+            >
               <CardHeader>
-                <CardTitle className="text-lg" style={{ color: "#0A2342" }}>
+                <CardTitle style={{ color: "#0A2342" }}>
                   Admin Panel
                 </CardTitle>
                 <CardDescription>Manage your dental clinic</CardDescription>
               </CardHeader>
+
               <CardContent className="space-y-2">
                 {menuItems.map((item) => {
                   const Icon = item.icon;
+
                   return (
                     <Link
                       key={item.id}
                       href={item.href}
-                      className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
-                        activeSection === item.id
-                          ? "bg-[#0A2342] text-white"
-                          : "hover:bg-gray-100 text-gray-700"
-                      }`}
                       onClick={() => setActiveSection(item.id)}
+                      className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                        activeSection === item.id
+                          ? "text-white"
+                          : "text-gray-700 hover:bg-[#0A2342]/10"
+                      }`}
+                      style={
+                        activeSection === item.id
+                          ? {
+                              background:
+                                "linear-gradient(135deg,#0A2342 0%,#0D2B4D 100%)",
+                            }
+                          : {}
+                      }
                     >
-                      <Icon className="h-5 w-5" />
+                      <Icon
+                        className="h-5 w-5"
+                        style={{
+                          color:
+                            activeSection === item.id
+                              ? "#FFFFFF"
+                              : "#BFA37C",
+                        }}
+                      />
+
                       <div>
                         <div className="font-medium">{item.label}</div>
                         <div className="text-xs opacity-75">
@@ -246,153 +280,147 @@ export default function AdminDashboard() {
           </div>
 
           {/* Main Content */}
-          <div className="lg:col-span-3">
-            <div className="space-y-6">
-              {/* Welcome Section */}
-              <Card>
-                <CardHeader>
-                  <CardTitle style={{ color: "#0A2342" }}>
-                    Welcome to Admin Dashboard
-                  </CardTitle>
-                  <CardDescription>
-                    Manage your dental clinic efficiently
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-gray-600">
-                    Use the sidebar to navigate between different sections. You
-                    can view and edit patient records, manage services, update
-                    dentist information, and modify clinic details.
-                  </p>
-                </CardContent>
-              </Card>
+          <div className="lg:col-span-3 space-y-6">
+            {/* Welcome */}
+            <Card
+              className="border-0"
+              style={{
+                background: "linear-gradient(180deg,#FFFFFF 0%,#FAF8F5 100%)",
+                boxShadow:
+                  "0 15px 50px -10px rgba(0,0,0,0.3),0 0 0 1px rgba(191,163,124,0.15)",
+              }}
+            >
+              <CardHeader>
+                <CardTitle
+                  style={{
+                    color: "#0A2342",
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                  }}
+                >
+                  Welcome to Admin Dashboard
+                </CardTitle>
 
-              {/* Quick Stats */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-lg bg-blue-100">
-                        <Users className="h-6 w-6 text-blue-600" />
+                <CardDescription>
+                  Manage your dental clinic efficiently
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <p className="text-gray-600">
+                  Use the sidebar to navigate between different sections. You
+                  can view and edit patient records, manage services, update
+                  dentist information, and modify clinic details.
+                </p>
+              </CardContent>
+            </Card>
+
+            {/* Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {[
+                {
+                  label: "Total Patients",
+                  value: stats.patients,
+                  icon: Users,
+                },
+                {
+                  label: "Active Services",
+                  value: stats.services,
+                  icon: Stethoscope,
+                },
+                {
+                  label: "Dentists",
+                  value: stats.dentists,
+                  icon: UserCheck,
+                },
+                {
+                  label: "Appointments",
+                  value: stats.appointments,
+                  icon: Calendar,
+                },
+              ].map((item, i) => {
+                const Icon = item.icon;
+
+                return (
+                  <Card
+                    key={i}
+                    className="border-0"
+                    style={{
+                      background:
+                        "linear-gradient(180deg,#FFFFFF 0%,#FAF8F5 100%)",
+                      boxShadow:
+                        "0 15px 40px -10px rgba(0,0,0,0.25),0 0 0 1px rgba(191,163,124,0.15)",
+                    }}
+                  >
+                    <CardContent className="p-6 flex items-center gap-4">
+                      <div
+                        className="p-3 rounded-xl"
+                        style={{
+                          background: "rgba(191,163,124,0.15)",
+                        }}
+                      >
+                        <Icon
+                          className="h-6 w-6"
+                          style={{ color: "#BFA37C" }}
+                        />
                       </div>
+
                       <div>
                         <p className="text-2xl font-bold text-gray-900">
-                          {loading ? "--" : stats.patients}
+                          {loading ? "--" : item.value}
                         </p>
-                        <p className="text-sm text-gray-600">Total Patients</p>
+                        <p className="text-sm text-gray-600">{item.label}</p>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-lg bg-green-100">
-                        <Stethoscope className="h-6 w-6 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {loading ? "--" : stats.services}
-                        </p>
-                        <p className="text-sm text-gray-600">Active Services</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-lg bg-purple-100">
-                        <UserCheck className="h-6 w-6 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {loading ? "--" : stats.dentists}
-                        </p>
-                        <p className="text-sm text-gray-600">Dentists</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 rounded-lg bg-orange-100">
-                        <Calendar className="h-6 w-6 text-orange-600" />
-                      </div>
-                      <div>
-                        <p className="text-2xl font-bold text-gray-900">
-                          {loading ? "--" : stats.appointments}
-                        </p>
-                        <p className="text-sm text-gray-600">Appointments</p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Quick Actions */}
-              <Card>
-                <CardHeader>
-                  <CardTitle style={{ color: "#0A2342" }}>
-                    Quick Actions
-                  </CardTitle>
-                  <CardDescription>Common administrative tasks</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Link href="/admin/patients">
-                      <Button
-                        className="w-full justify-start gap-2"
-                        variant="outline"
-                      >
-                        <Users className="h-4 w-4" />
-                        Manage Patients
-                      </Button>
-                    </Link>
-                    <Link href="/admin/services">
-                      <Button
-                        className="w-full justify-start gap-2"
-                        variant="outline"
-                      >
-                        <Stethoscope className="h-4 w-4" />
-                        Manage Services
-                      </Button>
-                    </Link>
-                    <Link href="/admin/dentists">
-                      <Button
-                        className="w-full justify-start gap-2"
-                        variant="outline"
-                      >
-                        <UserCheck className="h-4 w-4" />
-                        Manage Dentists
-                      </Button>
-                    </Link>
-                    <Link href="/admin/about">
-                      <Button
-                        className="w-full justify-start gap-2"
-                        variant="outline"
-                      >
-                        <FileText className="h-4 w-4" />
-                        Edit About Info
-                      </Button>
-                    </Link>
-                    <Link href="/admin/contact">
-                      <Button
-                        className="w-full justify-start gap-2"
-                        variant="outline"
-                      >
-                        <Phone className="h-4 w-4" />
-                        Manage Contact Details
-                      </Button>
-                    </Link>
-                  </div>
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
+
+            {/* Quick Actions */}
+            <Card
+              className="border-0"
+              style={{
+                background: "linear-gradient(180deg,#FFFFFF 0%,#FAF8F5 100%)",
+                boxShadow:
+                  "0 15px 50px -10px rgba(0,0,0,0.3),0 0 0 1px rgba(191,163,124,0.15)",
+              }}
+            >
+              <CardHeader>
+                <CardTitle style={{ color: "#0A2342" }}>
+                  Quick Actions
+                </CardTitle>
+
+                <CardDescription>
+                  Common administrative tasks
+                </CardDescription>
+              </CardHeader>
+
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    { href: "/admin/patients", label: "Manage Patients", icon: Users },
+                    { href: "/admin/services", label: "Manage Services", icon: Stethoscope },
+                    { href: "/admin/dentists", label: "Manage Dentists", icon: UserCheck },
+                    { href: "/admin/about", label: "Edit About Info", icon: FileText },
+                    { href: "/admin/contact", label: "Manage Contact Details", icon: Phone },
+                  ].map((item, i) => {
+                    const Icon = item.icon;
+
+                    return (
+                      <Link key={i} href={item.href}>
+                        <Button
+                          className="w-full justify-start gap-2 border-[#BFA37C] text-[#0A2342] hover:bg-[#BFA37C]/10"
+                          variant="outline"
+                        >
+                          <Icon className="h-4 w-4" />
+                          {item.label}
+                        </Button>
+                      </Link>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
