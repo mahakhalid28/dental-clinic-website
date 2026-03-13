@@ -64,7 +64,9 @@ export async function POST(request: Request) {
           name: body.name,
           email: body.email,
           phone: body.phone,
-          city: body.city,
+          city: body.city,          // <--- ADD THIS
+          blood_group: body.blood_group, 
+          gender: body.gender,// <--- ADD THIS
           history_diabetes: body.history_diabetes,
           history_heart: body.history_heart,
           history_hypertension: body.history_hypertension,
@@ -91,6 +93,7 @@ export async function POST(request: Request) {
         {
           patient_id: patient.id, // This links the appointment to the patient
           service_id: body.service_id,
+          dentist_id: body.dentist_id,
           appointment_date: body.appointment_date,
           appointment_time: body.appointment_time,
           notes: body.notes,

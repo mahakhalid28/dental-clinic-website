@@ -31,6 +31,10 @@ interface Service {
   duration_minutes: number;
   image?: string;
 }
+interface Dentist {
+  id: string;
+  name: string;
+}
 
 const timeSlots = [
   "9:00 AM",
@@ -56,22 +60,35 @@ export function AppointmentForm() {
   const [selectedTime, setSelectedTime] = useState("");
   // FIX 1: State must be INSIDE the function
   const [selectedService, setSelectedService] = useState("");
+  const [dentists, setDentists] = useState<Dentist[]>([]);
+  const [selectedDentist, setSelectedDentist] = useState("");
 
   useEffect(() => {
-    const fetchServices = async () => {
+    const fetchInitialData = async () => {
       try {
-        const response = await fetch("/api/services");
-        if (response.ok) {
-          const data: Service[] = await response.json();
-          setServices(data);
+        // We fetch both at once to save time
+        const [servicesRes, dentistsRes] = await Promise.all([
+          fetch("/api/services"),
+          fetch("/api/dentists"),
+        ]);
+
+        if (servicesRes.ok) {
+          const servicesData = await servicesRes.json();
+          setServices(servicesData);
+        }
+
+        if (dentistsRes.ok) {
+          const dentistsData = await dentistsRes.json();
+          setDentists(dentistsData);
         }
       } catch (error) {
-        console.error("Failed to fetch services:", error);
+        console.error("Failed to fetch initial data:", error);
       } finally {
         setLoadingServices(false);
       }
     };
-    fetchServices();
+
+    fetchInitialData();
   }, []);
 
   if (submitted) {
@@ -261,7 +278,11 @@ export function AppointmentForm() {
                     name: `${fd.get("firstName")} ${fd.get("lastName")}`.trim(),
                     email: fd.get("email"),
                     phone: fd.get("phone"),
+                    city: fd.get("city") || "Lahore",
+                    blood_group: fd.get("blood_group"),
+                    gender: fd.get("gender"),
                     service_id: fd.get("service"),
+                    dentist_id: fd.get("dentist_id"),
                     appointment_date: fd.get("date"),
                     appointment_time: selectedTime,
                     notes: fd.get("message"),
@@ -326,6 +347,50 @@ export function AppointmentForm() {
                       required
                     />
                   </div>
+                  {/* Add this inside the <div className="grid gap-5 sm:grid-cols-2"> */}
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      name="city"
+                      placeholder="e.g. Lahore"
+                      className="bg-white"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="blood_group">Blood Group</Label>
+                    <Select name="blood_group">
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Select Blood Group" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(
+                          (bg) => (
+                            <SelectItem key={bg} value={bg}>
+                              {bg}
+                            </SelectItem>
+                          ),
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  {/* Inside the grid div in appointment-form.tsx */}
+
+                  <div className="flex flex-col gap-2">
+                    <Label htmlFor="gender">Gender</Label>
+                    <Select name="gender">
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Select Gender" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="male">Male</SelectItem>
+                        <SelectItem value="female">Female</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
                   <div className="flex flex-col gap-2">
                     <Label htmlFor="service">Service</Label>
@@ -349,6 +414,36 @@ export function AppointmentForm() {
                       type="hidden"
                       name="service"
                       value={selectedService}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Label
+                      htmlFor="dentist"
+                      className="text-sm font-medium"
+                      style={{ color: "#0A2342" }}
+                    >
+                      Preferred Dentist
+                    </Label>
+                    <Select required onValueChange={setSelectedDentist}>
+                      <SelectTrigger
+                        id="dentist"
+                        className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
+                      >
+                        <SelectValue placeholder="Select a dentist" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dentists.map((dentist) => (
+                          <SelectItem key={dentist.id} value={dentist.id}>
+                            {dentist.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {/* This hidden input captures the ID for the form submission */}
+                    <input
+                      type="hidden"
+                      name="dentist_id"
+                      value={selectedDentist}
                     />
                   </div>
 
