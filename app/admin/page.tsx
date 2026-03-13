@@ -227,9 +227,7 @@ export default function AdminDashboard() {
               }}
             >
               <CardHeader>
-                <CardTitle style={{ color: "#0A2342" }}>
-                  Admin Panel
-                </CardTitle>
+                <CardTitle style={{ color: "#0A2342" }}>Admin Panel</CardTitle>
                 <CardDescription>Manage your dental clinic</CardDescription>
               </CardHeader>
 
@@ -260,9 +258,7 @@ export default function AdminDashboard() {
                         className="h-5 w-5"
                         style={{
                           color:
-                            activeSection === item.id
-                              ? "#FFFFFF"
-                              : "#BFA37C",
+                            activeSection === item.id ? "#FFFFFF" : "#BFA37C",
                         }}
                       />
 
@@ -390,19 +386,37 @@ export default function AdminDashboard() {
                   Quick Actions
                 </CardTitle>
 
-                <CardDescription>
-                  Common administrative tasks
-                </CardDescription>
+                <CardDescription>Common administrative tasks</CardDescription>
               </CardHeader>
 
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
-                    { href: "/admin/patients", label: "Manage Patients", icon: Users },
-                    { href: "/admin/services", label: "Manage Services", icon: Stethoscope },
-                    { href: "/admin/dentists", label: "Manage Dentists", icon: UserCheck },
-                    { href: "/admin/about", label: "Edit About Info", icon: FileText },
-                    { href: "/admin/contact", label: "Manage Contact Details", icon: Phone },
+                    {
+                      href: "/admin/patients",
+                      label: "Manage Patients",
+                      icon: Users,
+                    },
+                    {
+                      href: "/admin/services",
+                      label: "Manage Services",
+                      icon: Stethoscope,
+                    },
+                    {
+                      href: "/admin/dentists",
+                      label: "Manage Dentists",
+                      icon: UserCheck,
+                    },
+                    {
+                      href: "/admin/about",
+                      label: "Edit About Info",
+                      icon: FileText,
+                    },
+                    {
+                      href: "/admin/contact",
+                      label: "Manage Contact Details",
+                      icon: Phone,
+                    },
                   ].map((item, i) => {
                     const Icon = item.icon;
 

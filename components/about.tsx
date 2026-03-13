@@ -23,46 +23,82 @@ export function About() {
 
   // Hardcoded images for Ahmed and Sharqa
   const hardcodedImages: { [key: string]: string } = {
-    "ahmed": "ahmed.png",
-    "sharqa": "sharqa.png",
+    ahmed: "ahmed.png",
+    sharqa: "sharqa.png",
+    saif: "saif.png",
   };
 
   useEffect(() => {
     const fetchDentists = async () => {
       try {
         const response = await fetch("/api/dentists");
+
+        // 1. Yahan entry add karna zaroori hai taake logic image find kar sake
+        const mapping: { [key: string]: string } = {
+          ahmed: "ahmed.png",
+          sharqa: "sharqa.png",
+          saif: "saif.png", // Saif Rasool ke liye ye entry add ki
+        };
+
         if (response.ok) {
           const data = await response.json();
-          
-          // Update images for Ahmed and Sharqa if they exist
+
           const updatedDoctors = data.map((doctor: Dentist) => {
             const lowerName = doctor.name.toLowerCase();
-            for (const [key, imageName] of Object.entries(hardcodedImages)) {
+            // Loop check karega agar naam mein "saif" aata hai to saif.png laga do
+            for (const [key, imageName] of Object.entries(mapping)) {
               if (lowerName.includes(key)) {
                 return { ...doctor, profile_image: imageName };
               }
             }
             return doctor;
           });
-          
+
           setDoctors(updatedDoctors);
         } else {
-          console.error("API Error:", response.status);
-          // Fallback to hardcoded doctors if API fails
+          // Fallback data agar API slow ho ya kaam na kare
           setDoctors([
-            { id: "1", name: "Dr. Ahmed", specialization: "General Dentistry", profile_image: "ahmed.png" },
-            { id: "2", name: "Dr. Sharqa", specialization: "Orthodontics", profile_image: "sharqa.png" },
-                                { id: "3", name: "Dr. Saif", specialization: "BDS", profile_image: "saif.png" }
-
+            {
+              id: "1",
+              name: "Dr. Ahmed",
+              specialization: "General Dentistry",
+              profile_image: "ahmed.png",
+            },
+            {
+              id: "2",
+              name: "Dr. Sharqa",
+              specialization: "Orthodontics",
+              profile_image: "sharqa.png",
+            },
+            {
+              id: "3",
+              name: "Dr. Saif Rasool",
+              specialization: "BDS",
+              profile_image: "saif.png",
+            },
           ]);
         }
       } catch (error) {
         console.error("Failed to fetch dentists:", error);
-        // Fallback to hardcoded doctors if fetch fails
         setDoctors([
-          { id: "1", name: "Dr. Ahmed", specialization: "General Dentistry", profile_image: "ahmed.png" },
-          { id: "2", name: "Dr. Sharqa", specialization: "Orthodontics", profile_image: "sharqa.png" },
-                    { id: "3", name: "Dr. Saif", specialization: "BDS", profile_image: "saif.png" }
+          {
+            id: "1",
+            name: "Dr. Ahmed",
+            specialization: "General Dentistry",
+            profile_image: "ahmed.png",
+          },
+          {
+            id: "2",
+            name: "Dr. Sharqa",
+            specialization: "Orthodontics",
+            profile_image: "sharqa.png",
+          },
+          {
+            id: "3",
+            name: "Dr. Saif Rasool",
+            specialization: "BDS",
+            profile_image: "saif.png",
+          },
         ]);
       } finally {
         setLoading(false);
@@ -156,9 +192,9 @@ export function About() {
                       style={{ filter: "saturate(0.9)" }}
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                     />
-                </div>
+                  </div>
 
-                {/* Doctor Info */}
+                  {/* Doctor Info */}
                   <div
                     className="relative p-6 text-center transition-all duration-300"
                     style={{
