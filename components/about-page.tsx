@@ -78,34 +78,15 @@ const teamMembers = [
 // Gallery images - replace with actual clinic photos
 const galleryImages = [
   {
-    src: "/images/clinic-1.jpg",
-    alt: "Modern Reception Area",
-    category: "Reception",
-  },
-  {
-    src: "/images/clinic-2.jpg",
+    src: "/images/clinicimage1.png",
     alt: "State-of-the-art Treatment Room",
     category: "Treatment",
   },
+
   {
-    src: "/images/clinic-3.jpg",
-    alt: "Advanced Dental Equipment",
-    category: "Equipment",
-  },
-  {
-    src: "/images/clinic-4.jpg",
-    alt: "Comfortable Waiting Lounge",
-    category: "Lounge",
-  },
-  {
-    src: "/images/clinic-5.jpg",
+    src: "/images/clinicimage2.png",
     alt: "Sterilization Room",
     category: "Hygiene",
-  },
-  {
-    src: "/images/clinic-6.jpg",
-    alt: "Consultation Room",
-    category: "Consultation",
   },
 ];
 
