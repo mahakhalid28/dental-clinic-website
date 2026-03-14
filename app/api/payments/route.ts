@@ -58,14 +58,15 @@ export async function GET(request: Request) {
       const patientIds = [...new Set(payments.map(p => p.patient_id).filter(Boolean))];
       const appointmentIds = [...new Set(payments.map(p => p.appointment_id).filter(Boolean))];
 
-      const [patientsRes, appointmentsRes] = await Promise.all([
-        patientIds.length > 0
-          ? supabase.from("patients").select("id, first_name, last_name, email").in("id", patientIds)
-          : Promise.resolve({ data: [] }),
-        appointmentIds.length > 0
-          ? supabase.from("appointments").select("id, appointment_date, appointment_time, service_id").in("id", appointmentIds)
-          : Promise.resolve({ data: [] }),
-      ]);
+      // FIX: Use 'name' instead of 'first_name, last_name' to match your actual schema
+const [patientsRes, appointmentsRes] = await Promise.all([
+  patientIds.length > 0
+    ? supabase.from("patients").select("id, name, email").in("id", patientIds)
+    : Promise.resolve({ data: [] }),
+  appointmentIds.length > 0
+    ? supabase.from("appointments").select("id, appointment_date, appointment_time, service_id").in("id", appointmentIds)
+    : Promise.resolve({ data: [] }),
+]);
 
       const patients = patientsRes.data || [];
       const appointments = appointmentsRes.data || [];

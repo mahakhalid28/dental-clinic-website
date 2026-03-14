@@ -2,6 +2,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { NextResponse } from "next/server";
 
 // GET /api/payments/:id
+// GET /api/payments/:id
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
@@ -23,10 +24,18 @@ export async function GET(
     // Fetch related data
     const [patientRes, appointmentRes] = await Promise.all([
       payment.patient_id
-        ? supabase.from("patients").select("id, first_name, last_name, email, phone").eq("id", payment.patient_id).single()
+        ? supabase
+            .from("patients")
+            .select("id, name, email, phone") // UPDATED: Changed first_name, last_name to just 'name'
+            .eq("id", payment.patient_id)
+            .single()
         : Promise.resolve({ data: null }),
       payment.appointment_id
-        ? supabase.from("appointments").select("id, appointment_date, appointment_time, service_id, dentist_id").eq("id", payment.appointment_id).single()
+        ? supabase
+            .from("appointments")
+            .select("id, appointment_date, appointment_time, service_id, dentist_id")
+            .eq("id", payment.appointment_id)
+            .single()
         : Promise.resolve({ data: null }),
     ]);
 
