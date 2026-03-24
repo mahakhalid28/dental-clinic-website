@@ -209,62 +209,70 @@ export default function MessagesManagement() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-white border border-slate-100 shadow-[0_8px_32px_0_rgba(10,35,66,0.10)] rounded-xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-blue-100">
-                  <MessageSquare className="h-6 w-6 text-blue-600" />
+                <div className="p-3 rounded-xl bg-[#F9FAFB]">
+                  <MessageSquare className="h-6 w-6 text-[#0A2342]" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xs font-bold text-[#C5A27D] uppercase tracking-widest mb-1">
+                    Total Messages
+                  </p>
+                  <p className="text-2xl font-black text-[#0A2342]">
                     {messages.length}
                   </p>
-                  <p className="text-sm text-gray-600">Total Messages</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white border border-slate-100 shadow-[0_8px_32px_0_rgba(10,35,66,0.10)] rounded-xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-red-100">
-                  <Clock className="h-6 w-6 text-red-600" />
+                <div className="p-3 rounded-xl bg-[#F9FAFB]">
+                  <Clock className="h-6 w-6 text-[#0A2342]" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xs font-bold text-[#C5A27D] uppercase tracking-widest mb-1">
+                    Unread
+                  </p>
+                  <p className="text-2xl font-black text-[#0A2342]">
                     {unreadCount}
                   </p>
-                  <p className="text-sm text-gray-600">Unread</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white border border-slate-100 shadow-[0_8px_32px_0_rgba(10,35,66,0.10)] rounded-xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-green-100">
-                  <Reply className="h-6 w-6 text-green-600" />
+                <div className="p-3 rounded-xl bg-[#F9FAFB]">
+                  <Reply className="h-6 w-6 text-[#0A2342]" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xs font-bold text-[#C5A27D] uppercase tracking-widest mb-1">
+                    Replied
+                  </p>
+                  <p className="text-2xl font-black text-[#0A2342]">
                     {messages.filter((m) => m.status === "replied").length}
                   </p>
-                  <p className="text-sm text-gray-600">Replied</p>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <Card>
+          <Card className="bg-white border border-slate-100 shadow-[0_8px_32px_0_rgba(10,35,66,0.10)] rounded-xl">
             <CardContent className="p-6">
               <div className="flex items-center gap-4">
-                <div className="p-3 rounded-lg bg-yellow-100">
-                  <Archive className="h-6 w-6 text-yellow-600" />
+                <div className="p-3 rounded-xl bg-[#F9FAFB]">
+                  <Archive className="h-6 w-6 text-[#0A2342]" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-xs font-bold text-[#C5A27D] uppercase tracking-widest mb-1">
+                    Archived
+                  </p>
+                  <p className="text-2xl font-black text-[#0A2342]">
                     {messages.filter((m) => m.status === "archived").length}
                   </p>
-                  <p className="text-sm text-gray-600">Archived</p>
                 </div>
               </div>
             </CardContent>

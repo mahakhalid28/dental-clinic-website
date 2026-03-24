@@ -366,17 +366,17 @@ export default function PaymentsManagement() {
           ].map((stat, i) => (
             <Card
               key={i}
-              className="border-none shadow-[0_30px_60px_rgba(0,0,0,0.05)] rounded-[2rem] overflow-hidden bg-white"
+              className="bg-white border border-slate-100 shadow-[0_8px_32px_0_rgba(10,35,66,0.10)] rounded-xl overflow-hidden"
             >
               <CardContent className="p-8 flex items-center gap-6">
-                <div className={`p-5 rounded-2xl ${stat.bg} ${stat.color}`}>
-                  <stat.icon className="h-9 w-9" />
+                <div className={`p-5 rounded-xl bg-[#F9FAFB]`}>
+                  <stat.icon className="h-8 w-8 text-[#0A2342]" />
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">
+                  <p className="text-xs font-bold text-[#C5A27D] uppercase tracking-widest mb-1">
                     {stat.label}
                   </p>
-                  <p className="text-3xl font-black text-[#0A2342]">
+                  <p className="text-2xl font-black text-[#0A2342]">
                     {stat.val}
                   </p>
                 </div>
