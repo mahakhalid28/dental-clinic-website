@@ -58,6 +58,7 @@ interface ContactMessage {
   status: string;
   replied_at: string | null;
   created_at: string;
+  is_emergency: boolean;
 }
 
 export default function MessagesManagement() {
@@ -307,6 +308,7 @@ export default function MessagesManagement() {
                 <TableRow>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
+                  <TableHead>Phone Number</TableHead>
                   <TableHead>Subject</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Date</TableHead>
@@ -338,9 +340,32 @@ export default function MessagesManagement() {
                       }
                     >
                       <TableCell className="font-medium">
-                        {message.name}
+                        <span className="flex items-center gap-1">
+                          {message.name}
+                          {message.is_emergency && (
+                            <span
+                              title="Emergency"
+                              className="text-red-500 text-lg"
+                            >
+                              🚨
+                            </span>
+                          )}
+                        </span>
                       </TableCell>
                       <TableCell>{message.email}</TableCell>
+                      <TableCell>
+                        {message.phone ? (
+                          <a
+                            href={`tel:${message.phone}`}
+                            className="text-blue-600 hover:underline flex items-center gap-1"
+                          >
+                            <Phone className="h-4 w-4 inline" />
+                            {message.phone}
+                          </a>
+                        ) : (
+                          "-"
+                        )}
+                      </TableCell>
                       <TableCell>{message.subject || "-"}</TableCell>
                       <TableCell>{getStatusBadge(message.status)}</TableCell>
                       <TableCell>
@@ -360,6 +385,30 @@ export default function MessagesManagement() {
                           onClick={() => handleDelete(message.id)}
                         >
                           <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className={
+                            message.status === "replied" ||
+                            message.status === "archived"
+                              ? "opacity-50 cursor-not-allowed"
+                              : "text-green-700 border-green-700 hover:bg-green-50"
+                          }
+                          disabled={
+                            message.status === "replied" ||
+                            message.status === "archived"
+                          }
+                          onClick={async () => {
+                            // Mark as replied if unread/read, else archive
+                            const newStatus =
+                              message.status === "archived"
+                                ? "archived"
+                                : "replied";
+                            await handleStatusChange(message.id, newStatus);
+                          }}
+                        >
+                          Done
                         </Button>
                       </TableCell>
                     </TableRow>

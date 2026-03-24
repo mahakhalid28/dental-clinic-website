@@ -9,6 +9,7 @@ import {
   fadeInUp,
   scaleIn,
 } from "./motion";
+import { supabase } from "../lib/supabaseClient";
 
 interface ContactDetail {
   type: string;
@@ -32,11 +33,16 @@ export function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     subject: "",
-    message: ""
+    message: "",
   });
   const [submitting, setSubmitting] = useState(false);
-  const [submitMessage, setSubmitMessage] = useState<{type: 'success' | 'error', text: string} | null>(null);
+  const [submitMessage, setSubmitMessage] = useState<{
+    type: "success" | "error";
+    text: string;
+  } | null>(null);
+  const [errors, setErrors] = useState<{ email?: string; phone?: string }>({});
 
   useEffect(() => {
     fetchContactDetails();
@@ -47,7 +53,7 @@ export function Contact() {
       const response = await fetch("/api/contact");
       if (response.ok) {
         const data: ContactDetail[] = await response.json();
-        
+
         // Format the data for display
         const formatted = data.map((detail) => {
           let icon = MapPin;
@@ -93,7 +99,11 @@ export function Contact() {
         {
           icon: Clock,
           title: "Hours",
-          lines: ["Mon-Fri: 4:00 AM - 10:00 PM", "Sat: 10:00 AM - 4:00 PM", "Sun: Closed"],
+          lines: [
+            "Mon-Fri: 4:00 AM - 10:00 PM",
+            "Sat: 10:00 AM - 4:00 PM",
+            "Sun: Closed",
+          ],
         },
       ]);
     } finally {
@@ -101,37 +111,72 @@ export function Contact() {
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
+  ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+  };
+
+  const validate = () => {
+    const newErrors: { email?: string; phone?: string } = {};
+    // Email regex (simple)
+    if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address.";
+    }
+    // Phone: must be 11 digits, all numbers (Pakistan mobile format)
+    if (!/^\d{11}$/.test(formData.phone)) {
+      newErrors.phone = "Phone number must be 11 digits.";
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
     setSubmitting(true);
     setSubmitMessage(null);
 
     try {
-      const response = await fetch("/api/contact-message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const { error } = await supabase.from("contact_messages").insert([
+        {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          subject: formData.subject,
+          message: formData.message,
         },
-        body: JSON.stringify(formData),
-      });
+      ]);
 
-      if (response.ok) {
-        setSubmitMessage({ type: 'success', text: 'Message sent successfully! We will get back to you soon.' });
-        setFormData({ name: "", email: "", subject: "", message: "" });
+      if (!error) {
+        setSubmitMessage({
+          type: "success",
+          text: "Message sent successfully! We will get back to you soon.",
+        });
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
       } else {
-        setSubmitMessage({ type: 'error', text: 'Failed to send message. Please try again.' });
+        setSubmitMessage({
+          type: "error",
+          text: "Failed to send message. Please try again.",
+        });
       }
     } catch (error) {
-      console.error("Error sending message:", error);
-      setSubmitMessage({ type: 'error', text: 'Error sending message. Please try again.' });
+      setSubmitMessage({
+        type: "error",
+        text: "Error sending message. Please try again.",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -230,10 +275,7 @@ export function Contact() {
         </StaggerContainer>
 
         {/* Contact Form */}
-        <AnimateOnScroll
-          variants={fadeInUp}
-          className="mx-auto max-w-2xl"
-        >
+        <AnimateOnScroll variants={fadeInUp} className="mx-auto max-w-2xl">
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
             <h3
               className="text-2xl font-bold mb-6"
@@ -248,9 +290,9 @@ export function Contact() {
             {submitMessage && (
               <div
                 className={`mb-6 p-4 rounded-lg ${
-                  submitMessage.type === 'success'
-                    ? 'bg-green-100 text-green-800'
-                    : 'bg-red-100 text-red-800'
+                  submitMessage.type === "success"
+                    ? "bg-green-100 text-green-800"
+                    : "bg-red-100 text-red-800"
                 }`}
               >
                 {submitMessage.text}
@@ -258,7 +300,7 @@ export function Contact() {
             )}
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <div>
                   <label
                     htmlFor="name"
@@ -297,6 +339,31 @@ export function Contact() {
                     placeholder="your@email.com"
                     className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#BFA37C] focus:ring-2 focus:ring-[#BFA37C] focus:ring-opacity-50 transition-colors"
                   />
+                  {errors.email && (
+                    <p className="text-xs text-red-600 mt-1">{errors.email}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="phone"
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: "#0A2342" }}
+                  >
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    placeholder="03XXXXXXXXX"
+                    className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#BFA37C] focus:ring-2 focus:ring-[#BFA37C] focus:ring-opacity-50 transition-colors"
+                  />
+                  {errors.phone && (
+                    <p className="text-xs text-red-600 mt-1">{errors.phone}</p>
+                  )}
                 </div>
               </div>
 
@@ -308,15 +375,20 @@ export function Contact() {
                 >
                   Subject
                 </label>
-                <input
-                  type="text"
+                <select
                   id="subject"
                   name="subject"
                   value={formData.subject}
                   onChange={handleInputChange}
-                  placeholder="Message subject"
+                  required
                   className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-[#BFA37C] focus:ring-2 focus:ring-[#BFA37C] focus:ring-opacity-50 transition-colors"
-                />
+                >
+                  <option value="">Select a subject</option>
+                  <option value="Routine Checkup">Routine Checkup</option>
+                  <option value="Emergency/Pain">Emergency/Pain</option>
+                  <option value="Braces">Braces</option>
+                  <option value="Teeth Whitening">Teeth Whitening</option>
+                </select>
               </div>
 
               <div>
@@ -344,7 +416,9 @@ export function Contact() {
                 disabled={submitting}
                 className="w-full py-3 rounded-lg font-semibold text-white transition-all duration-300 flex items-center justify-center gap-2 hover:shadow-lg disabled:opacity-70"
                 style={{
-                  background: submitting ? '#999' : 'linear-gradient(135deg, #BFA37C 0%, #D4B896 100%)',
+                  background: submitting
+                    ? "#999"
+                    : "linear-gradient(135deg, #BFA37C 0%, #D4B896 100%)",
                   color: "#0A2342",
                 }}
               >
