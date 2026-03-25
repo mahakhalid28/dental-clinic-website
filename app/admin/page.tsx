@@ -116,13 +116,7 @@ export default function AdminDashboard() {
       href: "/admin/dentists",
       description: "Dentist profiles",
     },
-    {
-      id: "about",
-      label: "About Info",
-      icon: FileText,
-      href: "/admin/about",
-      description: "Clinic information",
-    },
+  
     {
       id: "contact",
       label: "Contact Details",
@@ -150,14 +144,7 @@ export default function AdminDashboard() {
       icon: MessageSquare,
       href: "/admin/messages",
       description: "Contact messages",
-    },
-    {
-      id: "reviews",
-      label: "Reviews",
-      icon: Star,
-      href: "/admin/reviews",
-      description: "Patient reviews",
-    },
+    }
   ];
 
   const statCards = [
