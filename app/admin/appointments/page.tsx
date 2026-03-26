@@ -475,7 +475,15 @@ export default function AppointmentsManagement() {
                                           <SelectValue placeholder="Select service" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="">None</SelectItem>
+                                          <SelectItem value="none">
+                                            None
+                                          </SelectItem>
+                                          <SelectItem value="none">
+                                            None
+                                          </SelectItem>
+                                          <SelectItem value="none">
+                                            None
+                                          </SelectItem>
                                           {services.map((s) => (
                                             <SelectItem key={s.id} value={s.id}>
                                               {s.service_name}
@@ -504,7 +512,15 @@ export default function AppointmentsManagement() {
                                           <SelectValue placeholder="Select dentist" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                          <SelectItem value="">None</SelectItem>
+                                          <SelectItem value="none">
+                                            None
+                                          </SelectItem>
+                                          <SelectItem value="none">
+                                            None
+                                          </SelectItem>
+                                          <SelectItem value="none">
+                                            None
+                                          </SelectItem>
                                           {dentists.map((d) => (
                                             <SelectItem key={d.id} value={d.id}>
                                               {d.name}
