@@ -31,6 +31,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 import {
   CreditCard,
   Plus,
@@ -196,6 +197,24 @@ export default function PaymentsManagement() {
     });
     setIsEditing(true);
     setIsDialogOpen(true);
+  };
+
+  // Mark payment as completed
+  const markAsCompleted = async (paymentId: string) => {
+    try {
+      const response = await fetch(`/api/payments/${paymentId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ payment_status: "completed" }),
+      });
+
+      if (response.ok) {
+        toast({ title: "Success", description: "Payment marked as completed" });
+        fetchData(); // Refresh the list
+      }
+    } catch (error) {
+      console.error("Update error:", error);
+    }
   };
 
   const getStatusBadge = (status: string) => {
@@ -496,6 +515,17 @@ export default function PaymentsManagement() {
                     </TableCell>
                     <TableCell className="text-right px-8">
                       <div className="flex justify-end gap-1">
+                        {payment.payment_status === "pending" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => markAsCompleted(payment.id)}
+                            className="rounded-full hover:bg-emerald-50 hover:text-emerald-600"
+                            title="Mark as Paid"
+                          >
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        )}
                         <Button
                           variant="ghost"
                           size="icon"

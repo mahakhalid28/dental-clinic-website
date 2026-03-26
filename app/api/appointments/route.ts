@@ -54,9 +54,7 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
 
-    // 1. Upsert the Patient first
-    // This looks for a patient with the same email. 
-    // If found, it updates them; if not, it creates a new one.
+    // 1. Upsert Patient
     const { data: patient, error: patientError } = await supabase
       .from("patients")
       .upsert(
@@ -64,9 +62,9 @@ export async function POST(request: Request) {
           name: body.name,
           email: body.email,
           phone: body.phone,
-          city: body.city,          // <--- ADD THIS
-          blood_group: body.blood_group, 
-          gender: body.gender,// <--- ADD THIS
+          city: body.city,
+          blood_group: body.blood_group,
+          gender: body.gender,
           history_diabetes: body.history_diabetes,
           history_heart: body.history_heart,
           history_hypertension: body.history_hypertension,
@@ -81,39 +79,49 @@ export async function POST(request: Request) {
       .select("id")
       .single();
 
-    if (patientError) {
-      console.error("Patient handling error:", patientError);
-      return NextResponse.json({ error: patientError.message }, { status: 400 });
-    }
+    if (patientError) return NextResponse.json({ error: patientError.message }, { status: 400 });
 
-    // 2. Insert the Appointment using the ID we just got from step 1
+    // 2. Insert Appointment
     const { data: appointment, error: appointmentError } = await supabase
       .from("appointments")
-      .insert([
-        {
-          patient_id: patient.id, // This links the appointment to the patient
-          service_id: body.service_id,
-          dentist_id: body.dentist_id,
-          appointment_date: body.appointment_date,
-          appointment_time: body.appointment_time,
-          notes: body.notes,
-          status: "scheduled",
-        },
-      ])
+      .insert([{
+        patient_id: patient.id,
+        service_id: body.service_id,
+        dentist_id: body.dentist_id,
+        appointment_date: body.appointment_date,
+        appointment_time: body.appointment_time,
+        notes: body.notes,
+        status: "scheduled",
+      }])
       .select()
       .single();
 
-    if (appointmentError) {
-      console.error("Appointment insert error:", appointmentError);
-      return NextResponse.json({ error: appointmentError.message }, { status: 500 });
-    }
+    if (appointmentError) return NextResponse.json({ error: appointmentError.message }, { status: 500 });
+
+    // --- NEW: AUTOMATED BILLING LOGIC ---
+    // 3. Get Service Price
+    const { data: serviceData } = await supabase
+      .from("services")
+      .select("price")
+      .eq("id", body.service_id)
+      .single();
+
+    const price = serviceData?.price || 0;
+
+    // 4. Create Payment Record
+    const invoiceNumber = `INV-${Date.now()}-${patient.id.slice(0, 4)}`.toUpperCase();
+    await supabase.from("payments").insert([{
+      patient_id: patient.id,
+      appointment_id: appointment.id,
+      amount: price,
+      payment_method: "cash",
+      payment_status: "pending",
+      invoice_number: invoiceNumber,
+      notes: `Automated bill for ${body.service_id} appointment`
+    }]);
 
     return NextResponse.json(appointment, { status: 201 });
   } catch (error) {
-    console.error("API error:", error);
-    return NextResponse.json(
-      { error: "Failed to create appointment" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create appointment" }, { status: 500 });
   }
 }

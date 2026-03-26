@@ -16,6 +16,7 @@ import {
   MessageSquare,
   Star,
   TrendingUp,
+  Receipt,
   ArrowUpRight,
   Menu,
   X,
@@ -116,7 +117,20 @@ export default function AdminDashboard() {
       href: "/admin/dentists",
       description: "Dentist profiles",
     },
-  
+    {
+      id: "expenses",
+      label: "Expenses",
+      icon: Receipt,
+      href: "/admin/expenses",
+      description: "Clinic expenses",
+    },
+    {
+      id: "revenue",
+      label: "Revenue",
+      icon: TrendingUp,
+      href: "/admin/revenue",
+      description: "Clinic revenue",
+    },
     {
       id: "contact",
       label: "Contact Details",
@@ -144,7 +158,7 @@ export default function AdminDashboard() {
       icon: MessageSquare,
       href: "/admin/messages",
       description: "Contact messages",
-    }
+    },
   ];
 
   const statCards = [

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { toast } from "./ui/use-toast";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,130 +13,141 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  CalendarDays,
-  Clock,
-  CheckCircle2,
-  Shield,
-  Users,
-  Award,
-  Phone,
-} from "lucide-react";
+import { CalendarDays, CheckCircle2, Phone } from "lucide-react";
 import { AnimateOnScroll, fadeInUp, scaleIn } from "./motion";
 
 interface Service {
   id: string;
   service_name: string;
-  description: string;
-  price: number;
-  duration_minutes: number;
-  image?: string;
 }
+
 interface Dentist {
   id: string;
   name: string;
 }
 
-const timeSlots = [
-  "9:00 AM",
-  "9:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-  "1:00 PM",
-  "1:30 PM",
-  "2:00 PM",
-  "2:30 PM",
-  "3:00 PM",
-  "3:30 PM",
-  "4:00 PM",
-  "4:30 PM",
-];
-
 export function AppointmentForm() {
+  const timeSlots = [
+    "9:00 AM",
+    "9:30 AM",
+    "10:00 AM",
+    "10:30 AM",
+    "11:00 AM",
+    "11:30 AM",
+    "1:00 PM",
+    "1:30 PM",
+    "2:00 PM",
+    "2:30 PM",
+    "3:00 PM",
+    "3:30 PM",
+    "4:00 PM",
+    "4:30 PM",
+  ];
+
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [services, setServices] = useState<Service[]>([]);
-  const [loadingServices, setLoadingServices] = useState(true);
-  const [selectedTime, setSelectedTime] = useState("");
-  // FIX 1: State must be INSIDE the function
-  const [selectedService, setSelectedService] = useState("");
   const [dentists, setDentists] = useState<Dentist[]>([]);
+  const [loadingInitial, setLoadingInitial] = useState(true);
+
+  // Controlled States for Selects
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedService, setSelectedService] = useState("");
   const [selectedDentist, setSelectedDentist] = useState("");
+
+  // Get today's date in YYYY-MM-DD format for the calendar min attribute
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        // We fetch both at once to save time
         const [servicesRes, dentistsRes] = await Promise.all([
           fetch("/api/services"),
           fetch("/api/dentists"),
         ]);
-
-        if (servicesRes.ok) {
-          const servicesData = await servicesRes.json();
-          setServices(servicesData);
-        }
-
-        if (dentistsRes.ok) {
-          const dentistsData = await dentistsRes.json();
-          setDentists(dentistsData);
-        }
+        if (servicesRes.ok) setServices(await servicesRes.json());
+        if (dentistsRes.ok) setDentists(await dentistsRes.json());
       } catch (error) {
         console.error("Failed to fetch initial data:", error);
       } finally {
-        setLoadingServices(false);
+        setLoadingInitial(false);
       }
     };
-
     fetchInitialData();
   }, []);
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (loading) return; // Prevent duplicate clicks
+
+    setLoading(true);
+    const form = e.currentTarget;
+    const fd = new FormData(form);
+
+    const payload = {
+      name: `${fd.get("firstName")} ${fd.get("lastName")}`.trim(),
+      email: fd.get("email"),
+      phone: fd.get("phone"),
+      city: fd.get("city") || "Lahore",
+      blood_group: fd.get("blood_group"),
+      gender: fd.get("gender"),
+      service_id: selectedService,
+      dentist_id: selectedDentist,
+      appointment_date: fd.get("date"),
+      appointment_time: selectedTime,
+      notes: fd.get("message"),
+      history_diabetes: fd.get("history_diabetes") === "yes",
+      history_heart: fd.get("history_heart") === "yes",
+      history_hypertension: fd.get("history_hypertension") === "yes",
+      history_bleeding: fd.get("history_bleeding") === "yes",
+      history_smoker: fd.get("history_smoker") === "yes",
+      history_pregnant: fd.get("history_pregnant") === "yes",
+      allergies: fd.get("allergies") || "",
+      current_medications: fd.get("medications") || "",
+    };
+
+    try {
+      const res = await fetch("/api/appointments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        toast({
+          title: "Success",
+          description: "Appointment requested successfully!",
+        });
+      } else {
+        throw new Error("Failed to book");
+      }
+    } catch (err) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (submitted) {
     return (
-      <section
-        id="appointment"
-        className="py-24 lg:py-32 relative overflow-hidden"
-        style={{
-          background:
-            "linear-gradient(135deg, #0A2342 0%, #0D2B4D 50%, #0A2342 100%)",
-        }}
-      >
-        <div className="mx-auto max-w-2xl px-6 text-center relative z-10">
-          <div
-            className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full"
-            style={{
-              background: "linear-gradient(135deg, #BFA37C 0%, #D4B896 100%)",
-            }}
-          >
-            <CheckCircle2 className="h-10 w-10 text-white" />
-          </div>
-          <h2
-            className="text-3xl font-bold tracking-tight md:text-4xl"
-            style={{
-              fontFamily: "'Playfair Display', Georgia, serif",
-              color: "#FFFFFF",
-            }}
-          >
-            Appointment Requested!
-          </h2>
-          <p
-            className="mt-4 text-lg leading-relaxed"
-            style={{ color: "rgba(255,255,255,0.8)" }}
-          >
-            Thank you for choosing Pearlshine Dental. Our team will reach out
-            within 24 hours to confirm your appointment.
+      <section className="py-24 text-center bg-[#0A2342] text-white">
+        <div className="mx-auto max-w-2xl px-6">
+          <CheckCircle2 className="mx-auto h-16 w-16 text-[#BFA37C] mb-6" />
+          <h2 className="text-3xl font-bold mb-4">Appointment Requested!</h2>
+          <p className="opacity-80">
+            We will contact you shortly to confirm your visit.
           </p>
-          <button
-            className="mt-8 px-8 py-3 rounded-full font-semibold transition-all duration-300"
-            style={{
-              background: "linear-gradient(135deg, #BFA37C 0%, #D4B896 100%)",
-              color: "#0A2342",
-            }}
+          <Button
+            className="mt-8 bg-[#BFA37C] text-[#0A2342]"
             onClick={() => setSubmitted(false)}
           >
-            Book Another Appointment
-          </button>
+            Book Another
+          </Button>
         </div>
       </section>
     );
@@ -144,261 +156,67 @@ export function AppointmentForm() {
   return (
     <section
       id="appointment"
-      className="py-24 lg:py-32 relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, #0A2342 0%, #0D2B4D 50%, #0A2342 100%)",
-      }}
+      className="py-24 bg-[#0A2342] relative overflow-hidden"
     >
-      <div
-        className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full opacity-10 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, #BFA37C 0%, transparent 60%)",
-        }}
-      />
-      <div
-        className="absolute bottom-0 left-0 w-[400px] h-[400px] rounded-full opacity-10 blur-3xl"
-        style={{
-          background: "radial-gradient(circle, #BFA37C 0%, transparent 60%)",
-        }}
-      />
       <div className="mx-auto max-w-7xl px-6 relative z-10">
-        <div className="grid lg:grid-cols-5 gap-12 lg:gap-16 items-start">
-          <AnimateOnScroll variants={fadeInUp} className="lg:col-span-2">
-            <div className="sticky top-8">
-              <span
-                className="inline-block px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.2em] mb-6"
-                style={{
-                  background: "rgba(191, 163, 124, 0.15)",
-                  color: "#BFA37C",
-                  border: "1px solid rgba(191, 163, 124, 0.3)",
-                }}
-              >
-                Book Your Visit
-              </span>
-              <h2
-                className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6"
-                style={{
-                  fontFamily: "'Playfair Display', Georgia, serif",
-                  color: "#FFFFFF",
-                  lineHeight: "1.2",
-                }}
-              >
-                Schedule Your{" "}
-                <span style={{ color: "#BFA37C" }}> Perfect Smile</span>
-              </h2>
-              <p
-                className="text-base mb-10 leading-relaxed"
-                style={{ color: "rgba(255,255,255,0.7)" }}
-              >
-                Take the first step towards exceptional dental care.
-              </p>
-              <div className="space-y-5">
-                {[
-                  {
-                    icon: Clock,
-                    title: "Quick Response",
-                    desc: "We respond within 2 hours",
-                  },
-                  {
-                    icon: Shield,
-                    title: "100% Confidential",
-                    desc: "Your information is secure",
-                  },
-                  {
-                    icon: Users,
-                    title: "Expert Care",
-                    desc: "3+ experienced dentists",
-                  },
-                ].map((item) => (
-                  <div
-                    key={item.title}
-                    className="flex items-start gap-4 group"
-                  >
-                    <div
-                      className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300 group-hover:scale-110"
-                      style={{ background: "rgba(191, 163, 124, 0.15)" }}
-                    >
-                      <item.icon
-                        className="w-5 h-5"
-                        style={{ color: "#BFA37C" }}
-                      />
-                    </div>
-                    <div>
-                      <h4 className="font-semibold text-white text-sm mb-0.5">
-                        {item.title}
-                      </h4>
-                      <p
-                        className="text-sm"
-                        style={{ color: "rgba(255,255,255,0.6)" }}
-                      >
-                        {item.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+        <div className="grid lg:grid-cols-5 gap-12">
+          <AnimateOnScroll
+            variants={fadeInUp}
+            className="lg:col-span-2 text-white"
+          >
+            <span className="text-[#BFA37C] font-bold uppercase tracking-widest text-sm">
+              Book Your Visit
+            </span>
+            <h2
+              className="text-4xl lg:text-5xl font-bold mt-4 mb-6"
+              style={{ fontFamily: "'Playfair Display', serif" }}
+            >
+              Schedule Your{" "}
+              <span className="text-[#BFA37C]">Perfect Smile</span>
+            </h2>
+            <p className="opacity-70">
+              Experience premium dental care tailored to your needs.
+            </p>
           </AnimateOnScroll>
 
-          <AnimateOnScroll
-            variants={scaleIn}
-            delay={0.2}
-            className="lg:col-span-3"
-          >
-            <div
-              className="rounded-3xl p-8 md:p-10"
-              style={{
-                background: "linear-gradient(180deg, #FFFFFF 0%, #FAF8F5 100%)",
-                boxShadow:
-                  "0 25px 80px -20px rgba(0,0,0,0.4), 0 0 0 1px rgba(191, 163, 124, 0.2)",
-              }}
-            >
-              <div className="mb-8 text-center">
-                <h3
-                  className="text-2xl font-bold mb-2"
-                  style={{
-                    fontFamily: "'Playfair Display', Georgia, serif",
-                    color: "#0A2342",
-                  }}
-                >
-                  Request an Appointment
-                </h3>
-                <p className="text-sm" style={{ color: "#6B7280" }}>
-                  Fill out the form below and we'll get back to you shortly
-                </p>
-              </div>
-
-              <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  const form = e.currentTarget as HTMLFormElement;
-                  const fd = new FormData(form);
-                  const payload = {
-                    name: `${fd.get("firstName")} ${fd.get("lastName")}`.trim(),
-                    email: fd.get("email"),
-                    phone: fd.get("phone"),
-                    city: fd.get("city") || "Lahore",
-                    blood_group: fd.get("blood_group"),
-                    gender: fd.get("gender"),
-                    service_id: fd.get("service"),
-                    dentist_id: fd.get("dentist_id"),
-                    appointment_date: fd.get("date"),
-                    appointment_time: selectedTime,
-                    notes: fd.get("message"),
-                    history_diabetes: fd.get("history_diabetes") === "yes",
-                    history_heart: fd.get("history_heart") === "yes",
-                    history_hypertension:
-                      fd.get("history_hypertension") === "yes",
-                    history_bleeding: fd.get("history_bleeding") === "yes",
-                    history_smoker: fd.get("history_smoker") === "yes",
-                    history_pregnant: fd.get("history_pregnant") === "yes",
-                    allergies: fd.get("allergies") || "",
-                    current_medications: fd.get("medications") || "",
-                  };
-                  try {
-                    const res = await fetch("/api/appointments", {
-                      method: "POST",
-                      headers: { "Content-Type": "application/json" },
-                      body: JSON.stringify(payload),
-                    });
-                    if (res.ok) setSubmitted(true);
-                  } catch (err) {
-                    console.error(err);
-                  }
-                }}
-              >
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div className="flex flex-col gap-2">
+          <AnimateOnScroll variants={scaleIn} className="lg:col-span-3">
+            <div className="bg-white rounded-3xl p-8 md:p-10 shadow-2xl">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                <div className="grid md:grid-cols-2 gap-5">
+                  <div className="space-y-2">
                     <Label htmlFor="firstName">First Name</Label>
-                    <Input
-                      id="firstName"
-                      name="firstName"
-                      placeholder="Jane"
-                      required
-                    />
+                    <Input id="firstName" name="firstName" required />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
-                    <Input
-                      id="lastName"
-                      name="lastName"
-                      placeholder="Doe"
-                      required
-                    />
+                    <Input id="lastName" name="lastName" required />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      placeholder="jane@example.com"
-                      required
-                    />
+                    <Input id="email" name="email" type="email" required />
                   </div>
-                  <div className="flex flex-col gap-2">
+                  <div className="space-y-2">
                     <Label htmlFor="phone">Phone</Label>
                     <Input
                       id="phone"
                       name="phone"
                       type="tel"
-                      placeholder="(555) 000-0000"
+                      placeholder="03xx-xxxxxxx"
                       required
                     />
                   </div>
-                  {/* Add this inside the <div className="grid gap-5 sm:grid-cols-2"> */}
 
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input
-                      id="city"
-                      name="city"
-                      placeholder="e.g. Lahore"
-                      className="bg-white"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="blood_group">Blood Group</Label>
-                    <Select name="blood_group">
+                  <div className="space-y-2">
+                    <Label>Service</Label>
+                    <Select
+                      required
+                      onValueChange={setSelectedService}
+                      value={selectedService}
+                    >
                       <SelectTrigger className="bg-white">
-                        <SelectValue placeholder="Select Blood Group" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"].map(
-                          (bg) => (
-                            <SelectItem key={bg} value={bg}>
-                              {bg}
-                            </SelectItem>
-                          ),
-                        )}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  {/* Inside the grid div in appointment-form.tsx */}
-
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="gender">Gender</Label>
-                    <Select name="gender">
-                      <SelectTrigger className="bg-white">
-                        <SelectValue placeholder="Select Gender" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="male">Male</SelectItem>
-                        <SelectItem value="female">Female</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="service">Service</Label>
-                    <Select required onValueChange={setSelectedService}>
-                      <SelectTrigger id="service">
                         <SelectValue
                           placeholder={
-                            loadingServices ? "Loading..." : "Select a service"
+                            loadingInitial ? "Loading..." : "Select Service"
                           }
                         />
                       </SelectTrigger>
@@ -410,60 +228,51 @@ export function AppointmentForm() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <input
-                      type="hidden"
-                      name="service"
-                      value={selectedService}
-                    />
                   </div>
-                  <div className="flex flex-col gap-2">
-                    <Label
-                      htmlFor="dentist"
-                      className="text-sm font-medium"
-                      style={{ color: "#0A2342" }}
+
+                  <div className="space-y-2">
+                    <Label>Preferred Dentist</Label>
+                    <Select
+                      required
+                      onValueChange={setSelectedDentist}
+                      value={selectedDentist}
                     >
-                      Preferred Dentist
-                    </Label>
-                    <Select required onValueChange={setSelectedDentist}>
-                      <SelectTrigger
-                        id="dentist"
-                        className="bg-white border border-gray-200 focus:border-[#BFA37C] focus:ring-[#BFA37C] transition-colors"
-                      >
-                        <SelectValue placeholder="Select a dentist" />
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Select Dentist" />
                       </SelectTrigger>
                       <SelectContent>
-                        {dentists.map((dentist) => (
-                          <SelectItem key={dentist.id} value={dentist.id}>
-                            {dentist.name}
+                        {dentists.map((d) => (
+                          <SelectItem key={d.id} value={d.id}>
+                            {d.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
-                    {/* This hidden input captures the ID for the form submission */}
-                    <input
-                      type="hidden"
-                      name="dentist_id"
-                      value={selectedDentist}
-                    />
                   </div>
 
-                  <div className="flex flex-col gap-2">
+                  <div className="space-y-2">
                     <Label htmlFor="date">Preferred Date</Label>
                     <div className="relative">
-                      <Input id="date" name="date" type="date" required />
-                      <CalendarDays className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="date"
+                        name="date"
+                        type="date"
+                        min={today}
+                        required
+                        className="w-full"
+                      />
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-2">
-                    <Label htmlFor="time">Preferred Time</Label>
+                  <div className="space-y-2">
+                    <Label>Preferred Time</Label>
                     <Select
                       required
-                      value={selectedTime}
                       onValueChange={setSelectedTime}
+                      value={selectedTime}
                     >
-                      <SelectTrigger id="time">
-                        <SelectValue placeholder="Select a time" />
+                      <SelectTrigger className="bg-white">
+                        <SelectValue placeholder="Select Time" />
                       </SelectTrigger>
                       <SelectContent>
                         {timeSlots.map((t) => (
@@ -473,54 +282,54 @@ export function AppointmentForm() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <input type="hidden" name="time" value={selectedTime} />
-                  </div>
-
-                  <div className="flex flex-col gap-2 sm:col-span-2">
-                    <Label htmlFor="message">Additional Notes</Label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      placeholder="Any concerns..."
-                      rows={4}
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-4 sm:col-span-2 mt-4">
-                    <h3 className="text-sm font-semibold">Medical History</h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {[
-                        "diabetes",
-                        "heart",
-                        "hypertension",
-                        "bleeding",
-                        "smoker",
-                        "pregnant",
-                      ].map((item) => (
-                        <label key={item} className="flex items-center gap-3">
-                          <input
-                            type="checkbox"
-                            name={`history_${item}`}
-                            value="yes"
-                            className="h-4 w-4"
-                          />
-                          <span className="text-sm capitalize">
-                            {item.replace("_", " ")}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
                   </div>
                 </div>
 
-                <div className="mt-10">
-                  <button
-                    type="submit"
-                    className="w-full py-4 rounded-xl text-base font-bold uppercase tracking-wider bg-[#0A2342] text-white"
-                  >
-                    Request Appointment
-                  </button>
+                <div className="space-y-2">
+                  <Label htmlFor="message">Additional Notes</Label>
+                  <Textarea
+                    id="message"
+                    name="message"
+                    placeholder="Describe your dental concern..."
+                  />
                 </div>
+
+                <div className="pt-4">
+                  <Label className="text-sm font-bold mb-3 block text-[#0A2342]">
+                    Medical History
+                  </Label>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-xl">
+                    {[
+                      "diabetes",
+                      "heart",
+                      "hypertension",
+                      "bleeding",
+                      "smoker",
+                      "pregnant",
+                    ].map((item) => (
+                      <label
+                        key={item}
+                        className="flex items-center gap-2 cursor-pointer hover:text-[#BFA37C] transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          name={`history_${item}`}
+                          value="yes"
+                          className="rounded border-gray-300 text-[#BFA37C] focus:ring-[#BFA37C]"
+                        />
+                        <span className="text-xs capitalize">{item}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-6 bg-[#0A2342] hover:bg-[#1a3a5f] text-white font-bold rounded-xl transition-all"
+                >
+                  {loading ? "Booking in progress..." : "Confirm Appointment"}
+                </Button>
               </form>
             </div>
           </AnimateOnScroll>
