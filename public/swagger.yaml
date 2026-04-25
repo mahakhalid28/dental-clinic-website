@@ -1,0 +1,2081 @@
+openapi: 3.0.3
+info:
+  title: Dental Clinic API
+  description: |
+    Complete REST API for the Dental Clinic Management System.
+    Covers patient management, appointments, dentists, services, payments, reviews, expenses, and admin operations.
+  version: 1.0.0
+  contact:
+    name: Dental Clinic Team
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local Development Server
+  - url: https://your-domain.com/api
+    description: Production Server
+
+tags:
+  - name: Admin
+    description: Admin authentication and profile
+  - name: Dashboard
+    description: Dashboard statistics and analytics
+  - name: Patients
+    description: Patient records management
+  - name: Appointments
+    description: Appointment scheduling and management
+  - name: Dentists
+    description: Dentist profiles management
+  - name: Services
+    description: Dental services management
+  - name: Payments
+    description: Payment and billing management
+  - name: Reviews
+    description: Patient review moderation
+  - name: Expenses
+    description: Clinic expense tracking
+  - name: Contact
+    description: Contact details and messages
+  - name: About
+    description: Clinic about/profile information
+
+paths:
+
+  # ─────────────────────────────────────────────
+  # ADMIN
+  # ─────────────────────────────────────────────
+
+  /admin/login:
+    post:
+      tags: [Admin]
+      summary: Admin login
+      description: Authenticates an admin user and sets an HttpOnly session cookie (7-day expiry).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password]
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: admin@dentalclinic.com
+                password:
+                  type: string
+                  example: Admin@123
+      responses:
+        '200':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Login successful
+                  admin:
+                    $ref: '#/components/schemas/Admin'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /admin/logout:
+    post:
+      tags: [Admin]
+      summary: Admin logout
+      description: Clears the session cookie and logs out the admin.
+      responses:
+        '200':
+          description: Logout successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Logout successful
+
+  /admin/register:
+    post:
+      tags: [Admin]
+      summary: Register a new admin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email, password, name]
+              properties:
+                name:
+                  type: string
+                  example: Dr. Admin
+                email:
+                  type: string
+                  format: email
+                  example: newadmin@dentalclinic.com
+                password:
+                  type: string
+                  example: SecurePass@123
+      responses:
+        '201':
+          description: Admin registered successfully
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /admin/profile:
+    get:
+      tags: [Admin]
+      summary: Get admin profile
+      description: Returns the profile of the currently authenticated admin.
+      responses:
+        '200':
+          description: Admin profile
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Admin'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  # ─────────────────────────────────────────────
+  # DASHBOARD
+  # ─────────────────────────────────────────────
+
+  /dashboard/stats:
+    get:
+      tags: [Dashboard]
+      summary: Get dashboard overview statistics
+      responses:
+        '200':
+          description: Dashboard statistics
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overview:
+                    type: object
+                    properties:
+                      total_patients:
+                        type: integer
+                        example: 120
+                      total_dentists:
+                        type: integer
+                        example: 5
+                      total_services:
+                        type: integer
+                        example: 18
+                      total_appointments:
+                        type: integer
+                        example: 340
+                  today:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      scheduled:
+                        type: integer
+                      confirmed:
+                        type: integer
+                      completed:
+                        type: integer
+                      cancelled:
+                        type: integer
+                      in_progress:
+                        type: integer
+                  month:
+                    type: object
+                    properties:
+                      appointments:
+                        type: integer
+                      revenue:
+                        type: number
+                      appointment_growth:
+                        type: number
+                      revenue_growth:
+                        type: number
+                  pending:
+                    type: object
+                    properties:
+                      payments:
+                        type: integer
+                      unread_messages:
+                        type: integer
+                      pending_reviews:
+                        type: integer
+                  generated_at:
+                    type: string
+                    format: date-time
+
+  /dashboard/today-appointments:
+    get:
+      tags: [Dashboard]
+      summary: Get today's appointments
+      responses:
+        '200':
+          description: List of today's appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+
+  /dashboard/patients:
+    get:
+      tags: [Dashboard]
+      summary: Get patient statistics
+      responses:
+        '200':
+          description: Patient statistics
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /dashboard/revenue:
+    get:
+      tags: [Dashboard]
+      summary: Get revenue data
+      responses:
+        '200':
+          description: Revenue analytics data
+          content:
+            application/json:
+              schema:
+                type: object
+
+  # ─────────────────────────────────────────────
+  # PATIENTS
+  # ─────────────────────────────────────────────
+
+  /patients:
+    get:
+      tags: [Patients]
+      summary: Get all patients
+      responses:
+        '200':
+          description: List of all patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Patient'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags: [Patients]
+      summary: Create a new patient
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientInput'
+      responses:
+        '201':
+          description: Patient created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /patients/search:
+    get:
+      tags: [Patients]
+      summary: Search patients
+      parameters:
+        - name: q
+          in: query
+          description: Search query (name, email, or phone)
+          schema:
+            type: string
+            example: John
+      responses:
+        '200':
+          description: Matching patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Patient'
+
+  /patients/{id}:
+    get:
+      tags: [Patients]
+      summary: Get a patient by ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Patient found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    put:
+      tags: [Patients]
+      summary: Update a patient
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientInput'
+      responses:
+        '200':
+          description: Patient updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    delete:
+      tags: [Patients]
+      summary: Delete a patient
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Patient deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Patient deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /patients/{id}/appointments:
+    get:
+      tags: [Patients]
+      summary: Get appointments for a patient
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Patient's appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+
+  # ─────────────────────────────────────────────
+  # APPOINTMENTS
+  # ─────────────────────────────────────────────
+
+  /appointments:
+    get:
+      tags: [Appointments]
+      summary: Get all appointments
+      description: Returns all appointments sorted by date descending, with enriched patient, dentist, and service data.
+      responses:
+        '200':
+          description: List of appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags: [Appointments]
+      summary: Book a new appointment
+      description: Creates an appointment. Also auto-creates a patient record and a pending payment/invoice.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentInput'
+      responses:
+        '201':
+          description: Appointment booked successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /appointments/{id}:
+    get:
+      tags: [Appointments]
+      summary: Get an appointment by ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Appointment found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Appointments]
+      summary: Update an appointment
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentInput'
+      responses:
+        '200':
+          description: Appointment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Appointment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags: [Appointments]
+      summary: Delete an appointment
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Appointment deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Appointment deleted successfully
+
+  /appointments/{id}/status:
+    put:
+      tags: [Appointments]
+      summary: Update appointment status
+      description: Updates only the status of an appointment and creates a history record.
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [status]
+              properties:
+                status:
+                  type: string
+                  enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show, rescheduled]
+                  example: completed
+                reason:
+                  type: string
+                  example: Treatment finished
+                notes:
+                  type: string
+                changed_by:
+                  type: string
+                  example: admin
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Status updated successfully
+                  appointment:
+                    $ref: '#/components/schemas/Appointment'
+                  previous_status:
+                    type: string
+                    example: scheduled
+                  new_status:
+                    type: string
+                    example: completed
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /appointments/{id}/history:
+    get:
+      tags: [Appointments]
+      summary: Get appointment status history
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Appointment history records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    appointment_id:
+                      type: string
+                    previous_status:
+                      type: string
+                    new_status:
+                      type: string
+                    reason:
+                      type: string
+                    changed_by:
+                      type: string
+                    created_at:
+                      type: string
+                      format: date-time
+
+  # ─────────────────────────────────────────────
+  # DENTISTS
+  # ─────────────────────────────────────────────
+
+  /dentists:
+    get:
+      tags: [Dentists]
+      summary: Get all active dentists
+      responses:
+        '200':
+          description: List of dentists
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dentist'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    post:
+      tags: [Dentists]
+      summary: Add a new dentist
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DentistInput'
+      responses:
+        '201':
+          description: Dentist added successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dentist'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /dentists/{id}:
+    get:
+      tags: [Dentists]
+      summary: Get a dentist by ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Dentist found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dentist'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Dentists]
+      summary: Update a dentist
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DentistInput'
+      responses:
+        '200':
+          description: Dentist updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dentist'
+
+    delete:
+      tags: [Dentists]
+      summary: Delete a dentist
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Dentist deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Dentist deleted successfully
+
+  /dentists/{id}/appointments:
+    get:
+      tags: [Dentists]
+      summary: Get appointments for a dentist
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Dentist's appointments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Appointment'
+
+  /dentists/{id}/image:
+    post:
+      tags: [Dentists]
+      summary: Upload dentist profile image
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                image:
+                  type: string
+                  format: binary
+      responses:
+        '200':
+          description: Image uploaded successfully
+
+  # ─────────────────────────────────────────────
+  # SERVICES
+  # ─────────────────────────────────────────────
+
+  /services:
+    get:
+      tags: [Services]
+      summary: Get all services
+      parameters:
+        - name: category
+          in: query
+          schema:
+            type: string
+          description: Filter by category
+        - name: active
+          in: query
+          schema:
+            type: string
+            default: 'true'
+          description: Filter by active status
+      responses:
+        '200':
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Service'
+
+    post:
+      tags: [Services]
+      summary: Create a new service
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceInput'
+      responses:
+        '201':
+          description: Service created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /services/{id}:
+    get:
+      tags: [Services]
+      summary: Get a service by ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Service found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Services]
+      summary: Update a service
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceInput'
+      responses:
+        '200':
+          description: Service updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Service'
+
+    delete:
+      tags: [Services]
+      summary: Delete a service
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Service deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Service deleted successfully
+
+  # ─────────────────────────────────────────────
+  # PAYMENTS
+  # ─────────────────────────────────────────────
+
+  /payments:
+    get:
+      tags: [Payments]
+      summary: Get all payments
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [pending, completed, failed, refunded, partial]
+        - name: method
+          in: query
+          schema:
+            type: string
+            enum: [cash, card, online, bank_transfer, insurance]
+        - name: patient_id
+          in: query
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Paginated payments list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Payment'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Payments]
+      summary: Create a payment record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentInput'
+      responses:
+        '201':
+          description: Payment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /payments/{id}:
+    get:
+      tags: [Payments]
+      summary: Get a payment by ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Payment found (with patient and appointment data)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Payments]
+      summary: Update a payment
+      description: Setting payment_status to "completed" will auto-set the paid_at timestamp.
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: number
+                payment_method:
+                  type: string
+                  enum: [cash, card, online, bank_transfer, insurance]
+                payment_status:
+                  type: string
+                  enum: [pending, completed, failed, refunded, partial]
+                transaction_id:
+                  type: string
+                discount_amount:
+                  type: number
+                tax_amount:
+                  type: number
+                notes:
+                  type: string
+      responses:
+        '200':
+          description: Payment updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+
+    delete:
+      tags: [Payments]
+      summary: Delete a payment
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Payment deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Payment deleted successfully
+
+  /payments/appointment/{id}:
+    get:
+      tags: [Payments]
+      summary: Get payment by appointment ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Payment for the given appointment
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─────────────────────────────────────────────
+  # REVIEWS
+  # ─────────────────────────────────────────────
+
+  /reviews:
+    get:
+      tags: [Reviews]
+      summary: Get all reviews
+      parameters:
+        - name: approved
+          in: query
+          schema:
+            type: string
+            enum: ['true', 'false']
+          description: Filter by approval status
+        - name: featured
+          in: query
+          schema:
+            type: string
+        - name: dentist_id
+          in: query
+          schema:
+            type: string
+        - name: min_rating
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 5
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Paginated reviews list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Reviews]
+      summary: Submit a review (public)
+      description: Submitted reviews require admin approval before they become visible.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReviewInput'
+      responses:
+        '201':
+          description: Review submitted successfully (pending approval)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Review submitted successfully and is pending approval.
+                  data:
+                    $ref: '#/components/schemas/Review'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /reviews/{id}:
+    get:
+      tags: [Reviews]
+      summary: Get a review by ID
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review found (with dentist and patient data)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      tags: [Reviews]
+      summary: Update / moderate a review (admin)
+      description: Setting is_approved to true auto-sets the approved_at timestamp.
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                is_approved:
+                  type: boolean
+                approved_by:
+                  type: string
+                  description: Required when is_approved is true
+                is_featured:
+                  type: boolean
+                is_visible:
+                  type: boolean
+                content:
+                  type: string
+                title:
+                  type: string
+                rating:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+      responses:
+        '200':
+          description: Review updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Review'
+
+    delete:
+      tags: [Reviews]
+      summary: Delete a review
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Review deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Review deleted successfully
+
+  /reviews/dentist/{id}:
+    get:
+      tags: [Reviews]
+      summary: Get reviews for a specific dentist
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Reviews for the dentist
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+
+  # ─────────────────────────────────────────────
+  # EXPENSES
+  # ─────────────────────────────────────────────
+
+  /expenses:
+    get:
+      tags: [Expenses]
+      summary: Get all expenses
+      responses:
+        '200':
+          description: List of all expenses
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Expense'
+
+    post:
+      tags: [Expenses]
+      summary: Add a new expense
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExpenseInput'
+      responses:
+        '201':
+          description: Expense created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Expense'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /expenses/{id}:
+    delete:
+      tags: [Expenses]
+      summary: Delete an expense
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Expense deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Expense deleted successfully
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  # ─────────────────────────────────────────────
+  # CONTACT
+  # ─────────────────────────────────────────────
+
+  /contact:
+    get:
+      tags: [Contact]
+      summary: Get clinic contact details
+      responses:
+        '200':
+          description: List of contact detail entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ContactDetail'
+
+    post:
+      tags: [Contact]
+      summary: Add a contact detail entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactDetail'
+      responses:
+        '201':
+          description: Contact detail created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactDetail'
+
+  /contact/{id}:
+    put:
+      tags: [Contact]
+      summary: Update a contact detail
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContactDetail'
+      responses:
+        '200':
+          description: Contact detail updated
+
+    delete:
+      tags: [Contact]
+      summary: Delete a contact detail
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: Contact detail deleted
+
+  /contact-message:
+    post:
+      tags: [Contact]
+      summary: Submit a contact form message (public)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, message]
+              properties:
+                name:
+                  type: string
+                  example: John Doe
+                email:
+                  type: string
+                  format: email
+                  example: john@example.com
+                message:
+                  type: string
+                  example: I would like to book a consultation.
+                subject:
+                  type: string
+                  example: Appointment Inquiry
+      responses:
+        '200':
+          description: Message sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Message sent successfully
+
+  /contact-messages:
+    get:
+      tags: [Contact]
+      summary: Get all contact form submissions (admin)
+      parameters:
+        - name: status
+          in: query
+          schema:
+            type: string
+            enum: [unread, read, replied, archived]
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        '200':
+          description: Paginated contact messages
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ContactMessage'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+    post:
+      tags: [Contact]
+      summary: Submit a contact message (alternative public endpoint)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, email, message]
+              properties:
+                name:
+                  type: string
+                email:
+                  type: string
+                  format: email
+                message:
+                  type: string
+                phone:
+                  type: string
+                subject:
+                  type: string
+      responses:
+        '201':
+          description: Message submitted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Message sent successfully
+                  data:
+                    $ref: '#/components/schemas/ContactMessage'
+
+  # ─────────────────────────────────────────────
+  # ABOUT
+  # ─────────────────────────────────────────────
+
+  /about:
+    get:
+      tags: [About]
+      summary: Get clinic about information
+      responses:
+        '200':
+          description: List of about info entries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AboutInfo'
+
+    post:
+      tags: [About]
+      summary: Add about information entry
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AboutInfo'
+      responses:
+        '201':
+          description: About entry created
+
+  /about/{id}:
+    put:
+      tags: [About]
+      summary: Update an about entry
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AboutInfo'
+      responses:
+        '200':
+          description: About entry updated
+
+    delete:
+      tags: [About]
+      summary: Delete an about entry
+      parameters:
+        - $ref: '#/components/parameters/IdParam'
+      responses:
+        '200':
+          description: About entry deleted
+
+# ─────────────────────────────────────────────
+# COMPONENTS
+# ─────────────────────────────────────────────
+
+components:
+
+  parameters:
+    IdParam:
+      name: id
+      in: path
+      required: true
+      description: Unique record identifier
+      schema:
+        type: string
+        example: a1b2c3d4-e5f6-7890-abcd-ef1234567890
+
+  responses:
+    BadRequest:
+      description: Bad request — missing or invalid fields
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Missing required fields
+    Unauthorized:
+      description: Authentication required or credentials invalid
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Invalid email or password
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Record not found
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: Internal server error
+
+  schemas:
+
+    Admin:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: Dr. Admin
+        email:
+          type: string
+          format: email
+          example: admin@dentalclinic.com
+        is_active:
+          type: boolean
+        last_login:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    Patient:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: Ahmed Khan
+        email:
+          type: string
+          format: email
+          example: ahmed@example.com
+        phone:
+          type: string
+          example: '+923001234567'
+        city:
+          type: string
+          example: Lahore
+        blood_group:
+          type: string
+          example: B+
+        gender:
+          type: string
+          enum: [male, female, other]
+        date_of_birth:
+          type: string
+          format: date
+        address:
+          type: string
+        emergency_contact:
+          type: string
+        history_diabetes:
+          type: boolean
+        history_heart:
+          type: boolean
+        history_hypertension:
+          type: boolean
+        history_bleeding:
+          type: boolean
+        history_smoker:
+          type: boolean
+        history_pregnant:
+          type: boolean
+        allergies:
+          type: string
+        current_medications:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    PatientInput:
+      type: object
+      required: [name, email, phone]
+      properties:
+        name:
+          type: string
+          example: Ahmed Khan
+        email:
+          type: string
+          format: email
+          example: ahmed@example.com
+        phone:
+          type: string
+          example: '+923001234567'
+        city:
+          type: string
+        blood_group:
+          type: string
+        gender:
+          type: string
+          enum: [male, female, other]
+        history_diabetes:
+          type: boolean
+          default: false
+        history_heart:
+          type: boolean
+          default: false
+        history_hypertension:
+          type: boolean
+          default: false
+        history_bleeding:
+          type: boolean
+          default: false
+        history_smoker:
+          type: boolean
+          default: false
+        history_pregnant:
+          type: boolean
+          default: false
+        allergies:
+          type: string
+        current_medications:
+          type: string
+
+    Appointment:
+      type: object
+      properties:
+        id:
+          type: string
+        patient_id:
+          type: string
+        service_id:
+          type: string
+        dentist_id:
+          type: string
+        appointment_date:
+          type: string
+          format: date
+          example: '2026-05-10'
+        appointment_time:
+          type: string
+          example: '10:00'
+        status:
+          type: string
+          enum: [scheduled, confirmed, in_progress, completed, cancelled, no_show, rescheduled]
+        notes:
+          type: string
+        patient:
+          $ref: '#/components/schemas/Patient'
+        dentist:
+          $ref: '#/components/schemas/Dentist'
+        service:
+          $ref: '#/components/schemas/Service'
+        created_at:
+          type: string
+          format: date-time
+
+    AppointmentInput:
+      type: object
+      required: [name, email, phone, service_id, appointment_date, appointment_time]
+      properties:
+        name:
+          type: string
+          example: Sara Ali
+        email:
+          type: string
+          format: email
+          example: sara@example.com
+        phone:
+          type: string
+          example: '+923009876543'
+        city:
+          type: string
+        blood_group:
+          type: string
+        gender:
+          type: string
+          enum: [male, female, other]
+        history_diabetes:
+          type: boolean
+        history_heart:
+          type: boolean
+        history_hypertension:
+          type: boolean
+        history_bleeding:
+          type: boolean
+        history_smoker:
+          type: boolean
+        history_pregnant:
+          type: boolean
+        allergies:
+          type: string
+        current_medications:
+          type: string
+        service_id:
+          type: string
+        dentist_id:
+          type: string
+        appointment_date:
+          type: string
+          format: date
+          example: '2026-05-10'
+        appointment_time:
+          type: string
+          example: '10:00'
+        notes:
+          type: string
+
+    Dentist:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: Dr. Khalid Mehmood
+        specialization:
+          type: string
+          example: Orthodontist
+        qualifications:
+          type: string
+          example: BDS, FCPS
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        experience_years:
+          type: integer
+          example: 10
+        bio:
+          type: string
+        image:
+          type: string
+          format: uri
+        license_number:
+          type: string
+        consultation_fee:
+          type: number
+        available_days:
+          type: string
+        working_hours_start:
+          type: string
+          example: '09:00'
+        working_hours_end:
+          type: string
+          example: '17:00'
+        is_active:
+          type: boolean
+          default: true
+        created_at:
+          type: string
+          format: date-time
+
+    DentistInput:
+      type: object
+      required: [name, specialization, qualifications]
+      properties:
+        name:
+          type: string
+        specialization:
+          type: string
+        qualifications:
+          type: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        experience_years:
+          type: integer
+          default: 0
+        bio:
+          type: string
+        image:
+          type: string
+        license_number:
+          type: string
+        consultation_fee:
+          type: number
+        available_days:
+          type: string
+        working_hours_start:
+          type: string
+        working_hours_end:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: string
+        service_name:
+          type: string
+          example: Teeth Whitening
+        description:
+          type: string
+        price:
+          type: number
+          example: 5000
+        duration_minutes:
+          type: integer
+          example: 45
+        category:
+          type: string
+        image:
+          type: string
+          format: uri
+        is_active:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    ServiceInput:
+      type: object
+      required: [service_name, price]
+      properties:
+        service_name:
+          type: string
+          example: Teeth Whitening
+        description:
+          type: string
+        price:
+          type: number
+          example: 5000
+        duration_minutes:
+          type: integer
+          default: 30
+        category:
+          type: string
+        image:
+          type: string
+        is_active:
+          type: boolean
+          default: true
+
+    Payment:
+      type: object
+      properties:
+        id:
+          type: string
+        appointment_id:
+          type: string
+        patient_id:
+          type: string
+        amount:
+          type: number
+          example: 5000
+        payment_method:
+          type: string
+          enum: [cash, card, online, bank_transfer, insurance]
+        payment_status:
+          type: string
+          enum: [pending, completed, failed, refunded, partial]
+        transaction_id:
+          type: string
+        invoice_number:
+          type: string
+        discount_amount:
+          type: number
+          default: 0
+        tax_amount:
+          type: number
+          default: 0
+        notes:
+          type: string
+        paid_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        patient:
+          $ref: '#/components/schemas/Patient'
+
+    PaymentInput:
+      type: object
+      required: [amount, payment_method]
+      properties:
+        amount:
+          type: number
+          example: 5000
+        payment_method:
+          type: string
+          enum: [cash, card, online, bank_transfer, insurance]
+        appointment_id:
+          type: string
+        patient_id:
+          type: string
+        payment_status:
+          type: string
+          enum: [pending, completed, failed, refunded, partial]
+          default: pending
+        transaction_id:
+          type: string
+        invoice_number:
+          type: string
+        discount_amount:
+          type: number
+          default: 0
+        tax_amount:
+          type: number
+          default: 0
+        notes:
+          type: string
+        created_by:
+          type: string
+
+    Review:
+      type: object
+      properties:
+        id:
+          type: string
+        reviewer_name:
+          type: string
+          example: Fatima Zahra
+        reviewer_email:
+          type: string
+          format: email
+        title:
+          type: string
+        content:
+          type: string
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        patient_id:
+          type: string
+        dentist_id:
+          type: string
+        appointment_id:
+          type: string
+        source:
+          type: string
+          example: website
+        is_approved:
+          type: boolean
+        is_featured:
+          type: boolean
+        is_visible:
+          type: boolean
+        approved_by:
+          type: string
+        approved_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+
+    ReviewInput:
+      type: object
+      required: [reviewer_name, content, rating]
+      properties:
+        reviewer_name:
+          type: string
+          example: Fatima Zahra
+        content:
+          type: string
+          example: Excellent service and very professional staff!
+        rating:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        patient_id:
+          type: string
+        dentist_id:
+          type: string
+        appointment_id:
+          type: string
+        reviewer_email:
+          type: string
+          format: email
+        title:
+          type: string
+        source:
+          type: string
+          default: website
+
+    Expense:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+          example: Monthly clinic rent
+        amount:
+          type: number
+          example: 50000
+        category:
+          type: string
+          enum: [Rent, Salaries, Materials, Partner Share, Utilities, Other]
+        expense_date:
+          type: string
+          format: date
+          example: '2026-04-01'
+        created_at:
+          type: string
+          format: date-time
+
+    ExpenseInput:
+      type: object
+      required: [description, amount, category, expense_date]
+      properties:
+        description:
+          type: string
+          example: Monthly clinic rent
+        amount:
+          type: number
+          example: 50000
+        category:
+          type: string
+          enum: [Rent, Salaries, Materials, Partner Share, Utilities, Other]
+        expense_date:
+          type: string
+          format: date
+          example: '2026-04-01'
+
+    ContactDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          enum: [Address, Phone, Email, Other]
+          example: Phone
+        line1:
+          type: string
+          example: '+92 300 1234567'
+        line2:
+          type: string
+        link:
+          type: string
+          format: uri
+        link_text:
+          type: string
+
+    ContactMessage:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+          example: John Doe
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        subject:
+          type: string
+        message:
+          type: string
+        status:
+          type: string
+          enum: [unread, read, replied, archived]
+        is_emergency:
+          type: boolean
+        ip_address:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    AboutInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        clinic_name:
+          type: string
+        description:
+          type: string
+        mission:
+          type: string
+        vision:
+          type: string
+        values:
+          type: string
+        history:
+          type: string
+        address:
+          type: string
+        phone:
+          type: string
+        email:
+          type: string
+          format: email
+        working_hours:
+          type: string
+        emergency_contact:
+          type: string
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+          example: 100
+        limit:
+          type: integer
+          example: 50
+        offset:
+          type: integer
+          example: 0
+        hasMore:
+          type: boolean
+          example: true

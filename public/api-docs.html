@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dental Clinic — API Documentation</title>
+    <meta name="description" content="Interactive API documentation for the Dental Clinic Management System" />
+    <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui.css" />
+    <style>
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Segoe UI', sans-serif;
+        background: #f4f6f9;
+      }
+
+      .topbar-custom {
+        background: #0A2342;
+        padding: 16px 32px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      }
+
+      .topbar-custom .logo {
+        font-size: 22px;
+        font-weight: 700;
+        color: #BFA37C;
+        letter-spacing: 0.5px;
+      }
+
+      .topbar-custom .subtitle {
+        font-size: 13px;
+        color: rgba(255,255,255,0.6);
+        margin-top: 2px;
+      }
+
+      .topbar-custom .badge {
+        margin-left: auto;
+        background: #BFA37C;
+        color: #0A2342;
+        font-size: 11px;
+        font-weight: 700;
+        padding: 4px 10px;
+        border-radius: 20px;
+        letter-spacing: 0.5px;
+      }
+
+      #swagger-ui {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 16px;
+      }
+
+      /* Override swagger topbar */
+      .swagger-ui .topbar { display: none !important; }
+
+      .swagger-ui .info .title {
+        color: #0A2342 !important;
+        font-size: 28px !important;
+      }
+
+      .swagger-ui .info .description {
+        color: #444 !important;
+      }
+
+      .swagger-ui .opblock-tag {
+        color: #0A2342 !important;
+        border-bottom-color: #BFA37C !important;
+      }
+
+      .swagger-ui .opblock.opblock-get .opblock-summary-method {
+        background: #0A2342 !important;
+      }
+
+      .swagger-ui .opblock.opblock-post .opblock-summary-method {
+        background: #BFA37C !important;
+      }
+
+      .swagger-ui .opblock.opblock-put .opblock-summary-method {
+        background: #2e6da4 !important;
+      }
+
+      .swagger-ui .opblock.opblock-delete .opblock-summary-method {
+        background: #c0392b !important;
+      }
+
+      .swagger-ui .btn.execute {
+        background: #0A2342 !important;
+        border-color: #0A2342 !important;
+      }
+
+      .swagger-ui .btn.execute:hover {
+        background: #BFA37C !important;
+        border-color: #BFA37C !important;
+      }
+
+      .swagger-ui section.models {
+        border: 1px solid #dde !important;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="topbar-custom">
+      <div>
+        <div class="logo">Dental Clinic</div>
+        <div class="subtitle">API Documentation — Management System</div>
+      </div>
+      <div class="badge">OpenAPI 3.0</div>
+    </div>
+
+    <div id="swagger-ui"></div>
+
+    <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.17.14/swagger-ui-standalone-preset.js"></script>
+    <script>
+      window.onload = function () {
+        SwaggerUIBundle({
+          url: '/swagger.yaml',
+          dom_id: '#swagger-ui',
+          deepLinking: true,
+          presets: [
+            SwaggerUIBundle.presets.apis,
+            SwaggerUIStandalonePreset
+          ],
+          layout: 'StandaloneLayout',
+          defaultModelsExpandDepth: 1,
+          defaultModelExpandDepth: 1,
+          docExpansion: 'list',
+          filter: true,
+          showExtensions: true,
+          showCommonExtensions: true,
+          tryItOutEnabled: true,
+        });
+      };
+    </script>
+  </body>
+</html>
